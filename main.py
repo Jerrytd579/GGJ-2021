@@ -1,5 +1,4 @@
 import pygame
-import esper
 import math
 
 pygame.init()
@@ -23,45 +22,37 @@ class Rect:
         self.y = y
         self.z = z;
         self.a = a
+       
 
-class MoveComponent:
-    def __init__(self,rect):
+        
+
+class Dude:
+    def __init__(self, rect):
         self.rect = rect
         self.speed = pygame.Vector2(0,0)
         self.velocity = 1
         self.accel = pygame.Vector2(0,0)
         self.angle = 90
-        
-class MoveProcessor(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed();
-        for ent,rec in self.world.get_component(MoveComponent):
-            if (keys[pygame.K_SPACE]):
-                rec.speed[1] += rec.velocity*(math.sin(rec.angle/180*math.pi))
-                rec.speed[0] += rec.velocity*(math.cos(rec.angle/180*math.pi))
-            if (keys[pygame.K_RIGHT]):
-                rec.angle -= 1
-            elif keys[pygame.K_LEFT]:
-                rec.angle += 1
-            rec.angle = max(0,min(rec.angle, 180))
-            rec.speed[1] -= .1
-            rec.rect.y -= rec.speed[1]
-            rec.rect.x += rec.speed[0]
-            render(ent.img,rec.rect,rec.angle)
-        
-
-class Rocket:
-    def __init__(self):
-        global world
         self.img = pygame.image.load('sprites/blastRocket.png')
-        world.add_component(self,MoveComponent(Rect(display_width*.5,display_height - 64, 64,64)))
+    def update(self):
+        keys = pygame.key.get_pressed();
+        velocity = 1
+        if (keys[pygame.K_SPACE]):
+            velocity = 10
+        #velocity *= pygame.time.Clock.get_time()
+        if (keys[pygame.K_RIGHT]):
+            self.rect.x += velocity
+        elif keys[pygame.K_LEFT]:
+            self.rect.x -= velocity
+        if keys[pygame.K_UP]:
+            self.rect.y -= velocity
+        elif keys[pygame.K_DOWN]:
+            self.rect.y += velocity
+        render(self.img,self.rect,self.angle)
 def render(img,rect,angle):
     gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.z,rect.a)),angle), (rect.x,rect.y))
 
-world = esper.World()
-move = MoveProcessor()
-world.add_processor(move)
-r = Rocket()
+r = Dude(Rect(display_width*.5,display_height - 64, 64,64))
 camera = Rect(0,0,display_width,display_height)
 while not crashed:
 
@@ -70,11 +61,10 @@ while not crashed:
             crashed = True
 
     gameDisplay.fill(white)
-    rect = world.component_for_entity(r,MoveComponent).rect
-    camera.x = rect.x + rect.z/2 - camera.z/2
-    camera.y = rect.y + rect.a/2 - camera.a/2
+    r.update()
+    camera.x = r.rect.x + r.rect.z/2 - camera.z/2
+    camera.y = r.rect.y + r.rect.a/2 - camera.a/2
         
-    world.process()
     pygame.display.update()
     clock.tick(60)
 
