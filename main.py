@@ -1,5 +1,6 @@
 import pygame
 import math
+import map
 import pygame.freetype
 
 pygame.init()
@@ -13,6 +14,7 @@ pygame.display.set_caption('A bit Racey')
 
 meleeSans =  pygame.freetype.Font("MeleeSans.ttf")
 sign = pygame.image.load("sprites/sign.png")
+tile = pygame.image.load("sprites/pixil-frame-0.png")
 
 justPressed = None
 black = (0,0,0)
@@ -31,27 +33,11 @@ class Level:
         self.objects.append(obj)
     def update(self,camera):
         for i in self.walls:
-            pygame.draw.rect(gameDisplay,black,i.move(-1*camera.x,-1*camera.y))
+            render(tile,i,0,camera)
+            #pygame.draw.rect(gameDisplay,black,i.move(-1*camera.x,-1*camera.y))
         
         for i in self.objects:
             i.update(camera)
-
-class Interactable:  #parent class of anything that can be interacted with
-    def __init__(self,rect, spritePath):
-        self.rect = rect
-        self.img = pygame.image.load(spritePath)
-    def update(self,camera):
-        render(self.img,self.rect,0,camera)
-    def interact(self):
-        print("Blank interact function")
-        
-class Sign(Interactable):
-    def __init__(self,message,rect,spritePath):
-        Interactable.__init__(self,rect,spritePath)
-        self.message = message
-    def interact(self):
-        l.reading = self.message
-    
 
 class Dude:
     def __init__(self, rect):
@@ -94,12 +80,14 @@ class Dude:
 def render(img,rect,angle,camera):
     gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
 
+
+
 r = Dude(pygame.Rect(display_width*.5,display_height - 64, 64,64))
 l = Level()
+map.load_map_objects(l)
 l.addWall(pygame.Rect(10,10,64,64))
 l.addWall(pygame.Rect(100,100,64,64))
 l.addWall(pygame.Rect(200,200,100,64))
-l.addObject(Sign("Hello world",pygame.Rect(300,200,100,100),"sprites/signIcon.png"))
 camera = pygame.Rect(0,0,display_width,display_height)
 baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
 clock = pygame.time.Clock()
@@ -121,18 +109,18 @@ while not crashed:
     else:
         surf,rect = meleeSans.render(l.reading,fgcolor = white,bgcolor = black,size = 100)  
 
-        render(surf,pygame.Rect(10,10,rect.w,rect.h),0,baseCamera)
         render(sign,pygame.Rect(10,10,display_width - 20, display_height - 20),0,baseCamera)
+        render(surf,pygame.Rect(30,30,rect.w,rect.h),0,baseCamera)
         if (justPressed == pygame.K_e):
             l.reading = ""
-      
+
     camera.x = r.rect.x + r.rect.w/2 - camera.w/2
     camera.y = r.rect.y + r.rect.h/2 - camera.h/2
     
 
         
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(120)
 
 pygame.quit()
 quit()

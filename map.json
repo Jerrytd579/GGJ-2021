@@ -1,20 +1,20 @@
 {
     "tree" : {
         "type": "sign",
-        "sprite" : "lol.png",
+        "sprite" : "sprites/tree.png",
         "message": "Welcome to The Park.\n We hope you enjoy your stay.",
         "interact_range" : {
             "x" : 0,
             "y" : 0,
-            "w" : 0,
-            "h" : 0
+            "w" : 100,
+            "h" : 100
         },
         "collision" : [
             {
             "x" : 0,
             "y" : 0,
             "w" : 10,
-            "h" : 0
+            "h" : 10
             }
         ]
     }
