@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 from player import Dude
 from enum import Enum
-from map import Level
+from map import Level, TulipField
 
 class GameStates(Enum):
     menu = 0
@@ -43,13 +43,17 @@ class Game:
         self.level.addWall(pygame.Rect(10,10,64,64))
         self.level.addWall(pygame.Rect(100,100,64,64))
         self.level.addWall(pygame.Rect(200,200,100,64))
+        self.level.addObject(TulipField(pygame.Rect(300,300,640,256),self))
         
     def should_stop(self):
         return self.running
 
-    def render(self, img, rect, angle):
-        self.display.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - self.camera.x,rect.y - self.camera.y))
-
+    @staticmethod
+    def blitToSurface(surface, img, rect, angle,camera): #in case other objects want to blit to a surface
+        surface.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
+    
+    def render(self, img, rect, angle,camera):
+        self.blitToSurface(self.display,img,rect,angle,camera)
     def update(self):
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
@@ -63,14 +67,14 @@ class Game:
                 for x in range(0, 255):
                     fade.set_alpha(255-x)
 
-                    self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0)
+                    self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
                     #TODO: Add wall rendering here
                     for obj in self.level.objects:
                         if(obj.rect.y < self.player.rect.y):
-                            self.render(obj.img, obj.rect, 0)
+                            self.render(obj.img, obj.rect, 0,self.camera)
 
-                        self.render(self.player.img, self.player.rect, 0)
+                        self.render(self.player.img, self.player.rect, 0,self.camera)
 
                         if(obj.rect.y > self.player.rect.y):
                                 self.render(obj.img, obj.rect, 0)
@@ -107,17 +111,15 @@ class Game:
                     self.level.reading = ""
 
             
-            self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0)
+            self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
             #TODO: Add wall rendering here
             for obj in self.level.objects:
                 if(obj.rect.y < self.player.rect.y):
-                    self.render(obj.img, obj.rect, 0)
+                    self.render(obj.img, obj.rect, 0,self.camera)
 
-                self.render(self.player.img, self.player.rect, 0)
+            self.render(self.player.img, self.player.rect, 0,self.camera)
 
-                if(obj.rect.y > self.player.rect.y):
-                    self.render(obj.img, obj.rect, 0)
 
 
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2

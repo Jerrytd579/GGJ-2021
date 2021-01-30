@@ -69,6 +69,8 @@ class Interactable:  #parent class of anything that can be interacted with
         self.rect = rect
         if spritePath != None:
             self.img = pygame.image.load(spritePath)
+        else:
+            self.img = None
     def update(self,camera):
         import main
         main.render(self.img,self.rect,0,camera)
@@ -90,39 +92,48 @@ class TulipField(Interactable):
     tulipSet = set() #set of positions where a tulip has been added
     tulipPerRow = 0
     correct = 0 #number of tulips clicked
-    def __init__(self,rect):
-        import main
+    curTulipImg = None #alternate surface for red tulips
+    tulipImg = None
+    def __init__(self,rect, game):
+        from game import Game
         Interactable.__init__(self,rect,None)
+        self.img = pygame.Surface((rect.w,rect.h))
         self.tulipPerRow = self.rect.w/self.dimen #number of tulips per row
-        self.curTulipImg = main.tulipImg.copy()
+        self.tulipImg = pygame.image.load("sprites/tulip.png")
+        self.curTulipImg = self.tulipImg.copy()
+        self.curTulipImg.fill((200,0,0,0), special_flags=pygame.BLEND_RGB_ADD)
         for i in range(20):
             key = self.randomTulip()
             while (key in self.tulipSet):
                 key = self.randomTulip()
             self.tulipSet.add(key)
             pos = self.keyToPos(key)
-            self.tulips.append((pos[0],pos[1]))
+            self.tulips.append(pos)
         self.curTulip = random.choice(tuple(self.tulipSet))
-    def randomTulip(self):#returns the key of a random tulip
+        for i in self.tulips:
+            if  self.convertPosToKey(i) == self.curTulip or self.correct >= 3:
+                game.blitToSurface(self.img,self.curTulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,game.camera)
+            else:
+                game.blitToSurface(self.img,self.tulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,game.baseCamera)
+    def randomTulip(self):#returns the key of a random tulip position
         x = random.randrange(0,self.tulipPerRow)
         y = random.randrange(0,self.rect.h/self.dimen)
         return y*self.tulipPerRow + x
     def keyToPos (self, key):
-        return (self.rect.x + key%(self.tulipPerRow)*self.dimen,self.rect.y + key//(self.tulipPerRow)*self.dimen)
+        return (key%(self.tulipPerRow)*self.dimen,key//(self.tulipPerRow)*self.dimen)
     def convertPosToKey(self, pos): #takes coordinates of a tulip and converts it to the index
-        return (pos[1]-self.rect.y)/self.dimen*self.tulipPerRow + (pos[0] - self.rect.x)/self.dimen
+        return (pos[1])/self.dimen*self.tulipPerRow + (pos[0])/self.dimen
     def update(self,camera):
-        import main
+        import game
         pos = self.keyToPos(self.curTulip)
         #pygame.draw.rect(main.gameDisplay,main.black,pygame.Rect(self.rect.x + pos[0] - camera.x,self.rect.y + pos[1] - camera.y,self.dimen,self.dimen))
         #while (newTulip == self.curTulip):
         #    newTulip = self.randomTulip()
-        self.curTulipImg.fill((1,0,0,0), special_flags=pygame.BLEND_RGB_ADD)
         for i in self.tulips:
             if  self.convertPosToKey(i) == self.curTulip or self.correct >= 3:
-                main.render(self.curTulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,camera)
+                game.Game.blitToSurface(self.img,self.curTulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,camera)
             else:
-                main.render(main.tulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,camera)
+                game.Game.blitToSurface(self.img,self.tulipImg,pygame.Rect(i[0],i[1],self.dimen,self.dimen),0,camera)
     def interact(self,dude):
         pos = self.keyToPos(self.curTulip)
         if dude.rect.colliderect(pygame.Rect(pos[0],pos[1],self.dimen,self.dimen)):
