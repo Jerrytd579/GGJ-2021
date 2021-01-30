@@ -1,18 +1,16 @@
 import pygame
 
 def menu_state(screen, font, clock):
-
     pygame.mixer_music.load('music/njit-title.wav')
-
     pygame.mixer_music.play()
 
     BLACK = (0, 0, 0)
     NOT_HELD = (23, 4, 30)
     WHITE = (255, 255, 255)
     HOVER_COLOR = (50, 70, 90)
-    text1 = font.render("Play", fgcolor=(0xff, 00, 00), size=32)[0]
-    text2 = font.render("Quit", fgcolor=(0xff, 00, 00), size=32)[0]
-    text3 = font.render("Insert Title Here", fgcolor=(0xff, 00, 00), size=32)[0]
+    text1 = font.render("Play", fgcolor=(0xff, 0xff, 0xff), size=32)[0]
+    text2 = font.render("Quit", fgcolor=(0xff, 0xff, 0xff), size=32)[0]
+    text3 = font.render("Insert Title Here", fgcolor=(0xff, 0xff, 0xff), size=32)[0]
     rect3 = pygame.Rect(500, 100, 400, 100)
     rect1 = pygame.Rect(600,300,205,60)
     rect2 = pygame.Rect(600,400,205,60)

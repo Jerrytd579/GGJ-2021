@@ -55,6 +55,8 @@ class Game:
             if(menu.menu_state(self.display, self.font, self.clock)):
                 self.state = GameStates.park
                 
+                #TODO: this could be cleaned up or moved to a function
+
                 fade = pygame.Surface((self.display_size[0], self.display_size[1]))
                 self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
                 fade.fill((0,0,0))
@@ -115,7 +117,7 @@ class Game:
                 self.render(self.player.img, self.player.rect, 0)
 
                 if(obj.rect.y > self.player.rect.y):
-                        self.render(obj.img, obj.rect, 0)
+                    self.render(obj.img, obj.rect, 0)
 
 
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
