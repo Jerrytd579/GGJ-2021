@@ -20,9 +20,9 @@ class Level:
     walls = []
     def addWall(self,wall):
         self.walls.append(wall)
-    def update(self):
+    def update(self,camera):
         for i in self.walls:
-            pygame.draw.rect(gameDisplay,black,i)
+            pygame.draw.rect(gameDisplay,black,i.move(-1*camera.x,-1*camera.y))
 
 class Dude:
     def __init__(self, rect):
@@ -59,7 +59,7 @@ class Dude:
             self.rect.y = vertRect.y
                 
 def render(img,rect,angle):
-    gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x,rect.y))
+    gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
 
 r = Dude(pygame.Rect(display_width*.5,display_height - 64, 64,64))
 l = Level()
@@ -76,9 +76,12 @@ while not crashed:
 
     gameDisplay.fill(white)
     r.update(l)
-    l.update()
+      
     camera.x = r.rect.x + r.rect.w/2 - camera.w/2
     camera.y = r.rect.y + r.rect.h/2 - camera.h/2
+    
+    l.update(camera)
+
         
     pygame.display.update()
     clock.tick(60)
