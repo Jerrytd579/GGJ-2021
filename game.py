@@ -79,13 +79,17 @@ class Game:
 
             
             self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0)
-            
+
             #TODO: Add wall rendering here
             for obj in self.level.objects:
-                self.render(obj.img, obj.rect, 0)
+                if(obj.rect.y < self.player.rect.y):
+                    self.render(obj.img, obj.rect, 0)
 
+                self.render(self.player.img, self.player.rect, 0)
 
-            self.render(self.player.img, self.player.rect, 0)
+                if(obj.rect.y > self.player.rect.y):
+                        self.render(obj.img, obj.rect, 0)
+
 
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
             self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
