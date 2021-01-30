@@ -14,6 +14,7 @@ pygame.display.set_caption('A bit Racey')
 meleeSans =  pygame.freetype.Font("MeleeSans.ttf")
 sign = pygame.image.load("sprites/sign.png")
 
+justPressed = None
 black = (0,0,0)
 white = (255,255,255) 
 
@@ -31,12 +32,16 @@ class Level:
     def update(self,camera):
         for i in self.walls:
             pygame.draw.rect(gameDisplay,black,i.move(-1*camera.x,-1*camera.y))
-            
+        
+        for i in self.objects:
+            i.update(camera)
 
 class Interactable:  #parent class of anything that can be interacted with
     def __init__(self,rect, spritePath):
         self.rect = rect
         self.img = pygame.image.load(spritePath)
+    def update(self,camera):
+        render(self.img,self.rect,0,camera)
     def interact(self):
         print("Blank interact function")
         
@@ -53,6 +58,7 @@ class Dude:
         self.rect = rect
         self.img = pygame.image.load('sprites/blastRocket.png')
     def update(self,level,camera):
+        global justPressed
         keys = pygame.key.get_pressed();
         velocity = .25
         if (keys[pygame.K_LSHIFT]):
@@ -82,7 +88,7 @@ class Dude:
         if collidedVert:
             self.rect.y = vertRect.y
         for i in level.objects:
-            if i.rect.colliderect(self.rect):
+            if i.rect.colliderect(self.rect) and justPressed == pygame.K_e:
                 i.interact()
                 
 def render(img,rect,angle,camera):
@@ -93,32 +99,36 @@ l = Level()
 l.addWall(pygame.Rect(10,10,64,64))
 l.addWall(pygame.Rect(100,100,64,64))
 l.addWall(pygame.Rect(200,200,100,64))
-#l.addObject(Sign("Hello world",pygame.Rect(500,500,100,100),"sprites/signIcon.png"))
+l.addObject(Sign("Hello world",pygame.Rect(300,200,100,100),"sprites/signIcon.png"))
 camera = pygame.Rect(0,0,display_width,display_height)
 baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
 clock = pygame.time.Clock()
 while not crashed:
-
+    keyDown = False
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            crashed = True
-
+        if event.type == pygame.KEYDOWN:  
+            keyDown = True
+            justPressed = event.key
+        else:
+            if event.type == pygame.QUIT:
+                crashed = True
+    if (keyDown == False):
+        justPressed = None
     gameDisplay.fill(white)
     if (l.reading == ""):
         r.update(l,camera)
-
+        l.update(camera)
     else:
         surf,rect = meleeSans.render(l.reading,fgcolor = white,bgcolor = black,size = 100)  
 
         render(surf,pygame.Rect(10,10,rect.w,rect.h),0,baseCamera)
-        #render(sign,pygame.Rect(10,10,display_width - 20, display_height - 20),0,baseCamera)
-        if (pygame.key.get_pressed()[pygame.K_e]):
+        render(sign,pygame.Rect(10,10,display_width - 20, display_height - 20),0,baseCamera)
+        if (justPressed == pygame.K_e):
             l.reading = ""
       
     camera.x = r.rect.x + r.rect.w/2 - camera.w/2
     camera.y = r.rect.y + r.rect.h/2 - camera.h/2
     
-    l.update(camera)
 
         
     pygame.display.update()
