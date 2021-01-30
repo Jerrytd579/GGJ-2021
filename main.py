@@ -65,7 +65,6 @@ class Dude:
         vertRect = self.rect.move(0,speeds[1])
         collidedHoriz = pygame.Rect(0,0,0,0)
         collidedVert = pygame.Rect(0,0,0,0)
-        print(collidedHoriz,collidedVert)
         for i in level.walls:
             if i.colliderect(horizRect):
                 collidedHoriz = i
@@ -87,7 +86,7 @@ class Dude:
                 self.rect.y = collidedVert.y + collidedVert.h
         for i in level.objects:
             if i.rect.colliderect(self.rect) and justPressed == pygame.K_e:
-                i.interact()
+                i.interact(self)
                 
 def render(img,rect,angle,camera):
     gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
@@ -100,7 +99,7 @@ map.load_map_objects(l)
 l.addWall(pygame.Rect(10,10,64,64))
 l.addWall(pygame.Rect(100,100,64,64))
 l.addWall(pygame.Rect(200,200,100,64))
-l.addObject(map.TulipField(pygame.Rect(500,500,640,64)))
+l.addObject(map.TulipField(pygame.Rect(500,500,640,320)))
 camera = pygame.Rect(0,0,display_width,display_height)
 baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
 clock = pygame.time.Clock()
