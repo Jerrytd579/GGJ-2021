@@ -8,13 +8,15 @@ display_width = 800
 display_height = 600
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
-pygame.display.set_caption('A bit Racey')
+pygame.display.set_caption('Title here')
+
+mapSurface = pygame.Surface((1538,1280))
 
 black = (0,0,0)
 white = (255,255,255) 
 
 clock = pygame.time.Clock()
-crashed = False      
+closed = False      
 
 class Level:
     walls = []
@@ -31,8 +33,6 @@ class Dude:
     def update(self,level):
         keys = pygame.key.get_pressed();
         velocity = .25
-        if (keys[pygame.K_LSHIFT]):
-            velocity = .5
         velocity *= clock.get_time()
         speeds = pygame.Vector2(0,0)
         if (keys[pygame.K_RIGHT]):
@@ -61,20 +61,47 @@ class Dude:
 def render(img,rect,angle):
     gameDisplay.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
 
-r = Dude(pygame.Rect(display_width*.5,display_height - 64, 64,64))
+def render2(img,rect,angle):
+    mapSurface.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
+
+r = Dude(pygame.Rect(0,0, 64,64))
 l = Level()
-l.addWall(pygame.Rect(10,10,64,64))
-l.addWall(pygame.Rect(100,100,64,64))
-l.addWall(pygame.Rect(200,200,100,64))
+##l.addWall(pygame.Rect(10,10,64,64))
+##l.addWall(pygame.Rect(100,100,64,64))
+##l.addWall(pygame.Rect(200,200,100,64))
 camera = pygame.Rect(0,0,display_width,display_height)
 clock = pygame.time.Clock()
-while not crashed:
+
+#gameDisplay.blit
+pygame.draw.rect(gameDisplay, black, (300,300, 32, 32))
+render(pygame.image.load("sprites/path_left_grass.png"),pygame.Rect(300,300,32,32),0)
+
+for x in range(0, 1537, 128):
+    for y in range(0, 1281, 32):
+        render2(pygame.image.load("sprites/path_left_grass.png"),pygame.Rect(300 - x,300 - y,32,32),0)
+        render2(pygame.image.load("sprites/path.png"),pygame.Rect(332 - x,300 - y,32,32),0)
+        render2(pygame.image.load("sprites/path.png"),pygame.Rect(364 - x,300 - y,32,32),0)
+        render2(pygame.image.load("sprites/path_right_grass.png"),pygame.Rect(396 - x,300 - y,32,32),0)
+
+
+
+
+while not closed:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            crashed = True
+            closed = True
 
     gameDisplay.fill(white)
+##    for y in range(0, 1281, 32):
+##        
+##        render(pygame.image.load("sprites/path_left_grass.png"),pygame.Rect(300,300 - y,32,32),0)
+##        render(pygame.image.load("sprites/path.png"),pygame.Rect(332,300 - y,32,32),0)
+##        render(pygame.image.load("sprites/path.png"),pygame.Rect(364,300 - y,32,32),0)
+##        render(pygame.image.load("sprites/path_right_grass.png"),pygame.Rect(396,300 - y,32,32),0)
+
+    render(mapSurface, pygame.Rect(0,0,1538,1280),0)
+    
     r.update(l)
       
     camera.x = r.rect.x + r.rect.w/2 - camera.w/2
@@ -84,7 +111,7 @@ while not crashed:
 
         
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(120)
 
 pygame.quit()
 quit()
