@@ -1,53 +1,23 @@
 import pygame
 import json
 
-###########
-# You should move this code into main or another python file
-from enum import Enum
+def loadTilemapAsSurface(tilemap_path):
+    mapSurface = pygame.Surface((1600,1344))
 
-class GameStates(Enum):
-    menu = 0
-    park = 1
-    minigame = 2
+    tilemap = open(tilemap_path, 'r')
+    tiles = tilemap.read().replace('\n',',').split(',')
+    tilemap.close()
+    tile_imgs = [pygame.image.load("sprites/path_right_grass.png"), pygame.image.load("sprites/path_left_grass.png"), pygame.image.load("sprites/path.png")]
 
-class State:
-    instance = None
-    state = GameStates.menu
-    flags = {}
-    game_map = {}
+    for y in range(0, 42):
+        for x in range(0,50):
+            tile = int(tiles[(y * 50) + x])
+            if(tile != 3):
+                mapSurface.blit(pygame.transform.scale(tile_imgs[tile], (32,32)), (x*32, y*32))
 
-    @staticmethod
-    def inst():
-        if(isinstance == None):
-            State()
+    return mapSurface
 
-        return State.instance
-
-    def __init__(self):
-        if not State.instance:
-            State.instance = self
-
-########
-
-class Interactable:  #parent class of anything that can be interacted with
-    def __init__(self,rect, spritePath):
-        self.rect = rect
-        self.img = pygame.image.load(spritePath)
-    def update(self,camera):
-        import main
-        main.render(self.img,self.rect,0,camera)
-    def interact(self):
-        print("Blank interact function")
-
-class Sign(Interactable):
-    def __init__(self,message,rect,spritePath):
-        Interactable.__init__(self,rect,spritePath)
-        self.message = message
-    def interact(self):
-        from main import l
-        l.reading = self.message
-
-def load_map_objects(level):
+def loadMapObjects(level):
     f = open('map.json') 
     map_dict = json.load(f)
 
@@ -58,6 +28,39 @@ def load_map_objects(level):
             s = Sign(obj['message'], interact, obj['sprite'])
             
             level.addObject(s)
+
+class Level:
+    reading = ""
+    walls = []
+    objects = [] #anything that can be interacted with
+
+    def __init__(self):
+        self.tilemap = loadTilemapAsSurface('test.csv')
+        loadMapObjects(self)
+
+    def addWall(self,wall):
+        self.walls.append(wall)
+
+    def addObject(self,obj):
+        self.objects.append(obj)
+
+class Interactable:  #parent class of anything that can be interacted with
+    def __init__(self,rect, spritePath):
+        self.rect = rect
+        self.img = pygame.image.load(spritePath)
+
+    def interact(self):
+        print("Blank interact function")
+
+class Sign(Interactable):
+    def __init__(self,message,rect,spritePath):
+        Interactable.__init__(self,rect,spritePath)
+        self.message = message
+
+    def interact(self):
+        from main import l
+        l.reading = self.message
+
             
             
             
