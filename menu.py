@@ -1,6 +1,11 @@
 import pygame
 
 def menu_state(screen, font, clock):
+
+    pygame.mixer_music.load('music/njit-title.wav')
+
+    pygame.mixer_music.play()
+
     BLACK = (0, 0, 0)
     NOT_HELD = (23, 4, 30)
     WHITE = (255, 255, 255)
@@ -33,6 +38,17 @@ def menu_state(screen, font, clock):
                 if rect2.collidepoint(pos):
                     pygame.quit()
                 elif rect1.collidepoint(pos):
+                    pygame.mixer.music.stop()
+
+                    fade = pygame.Surface((1280,720))
+                    fade.fill((0,0,0))
+
+                    for x in range(0, 255):
+                        fade.set_alpha(x)
+                        screen.blit(fade, pygame.Rect(0, 0, 1280, 720))
+                        pygame.display.flip()
+                        clock.tick(127.5)
+
                     return True
 
         screen.fill((255, 251, 219))
