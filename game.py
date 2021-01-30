@@ -37,6 +37,9 @@ class Game:
         self.player = Dude(pygame.Rect(w * 0.5, h - 64, 64,64))
         self.level = Level()
 
+        self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
+        self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
+
         self.level.addWall(pygame.Rect(10,10,64,64))
         self.level.addWall(pygame.Rect(100,100,64,64))
         self.level.addWall(pygame.Rect(200,200,100,64))
@@ -51,6 +54,30 @@ class Game:
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
                 self.state = GameStates.park
+                
+                fade = pygame.Surface((self.display_size[0], self.display_size[1]))
+                self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+                fade.fill((0,0,0))
+                for x in range(0, 255):
+                    fade.set_alpha(255-x)
+
+                    self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0)
+
+                    #TODO: Add wall rendering here
+                    for obj in self.level.objects:
+                        if(obj.rect.y < self.player.rect.y):
+                            self.render(obj.img, obj.rect, 0)
+
+                        self.render(self.player.img, self.player.rect, 0)
+
+                        if(obj.rect.y > self.player.rect.y):
+                                self.render(obj.img, obj.rect, 0)
+
+                    self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+                    pygame.display.flip()
+                    self.clock.tick(127.5)
+
+                
         elif(self.state == GameStates.park):
             keyDown = False
             for event in pygame.event.get():
