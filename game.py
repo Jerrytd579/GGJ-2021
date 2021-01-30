@@ -54,6 +54,7 @@ class Game:
     
     def render(self, img, rect, angle,camera):
         self.blitToSurface(self.display,img,rect,angle,camera)
+
     def update(self):
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
@@ -118,9 +119,10 @@ class Game:
                 if(obj.rect.y < self.player.rect.y):
                     self.render(obj.img, obj.rect, 0,self.camera)
 
-            self.render(self.player.img, self.player.rect, 0,self.camera)
+                self.render(self.player.img, self.player.rect, 0,self.camera)
 
-
+                if(obj.rect.y > self.player.rect.y):
+                    self.render(obj.img, obj.rect, 0,self.camera)
 
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
             self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
