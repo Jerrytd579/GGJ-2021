@@ -15,6 +15,7 @@ pygame.display.set_caption('A bit Racey')
 meleeSans =  pygame.freetype.Font("MeleeSans.ttf")
 sign = pygame.image.load("sprites/sign.png")
 tile = pygame.image.load("sprites/pixil-frame-0.png")
+tulipImg = pygame.image.load("sprites/tulip.png")
 
 justPressed = None
 black = (0,0,0)
@@ -62,17 +63,28 @@ class Dude:
         render(self.img,self.rect,0,camera)
         horizRect = self.rect.move(speeds[0],0)
         vertRect = self.rect.move(0,speeds[1])
-        collidedHoriz = True
-        collidedVert = True
+        collidedHoriz = pygame.Rect(0,0,0,0)
+        collidedVert = pygame.Rect(0,0,0,0)
+        print(collidedHoriz,collidedVert)
         for i in level.walls:
             if i.colliderect(horizRect):
-                collidedHoriz = False
+                collidedHoriz = i
             if i.colliderect(vertRect):
-                collidedVert = False;
-        if collidedHoriz:
+                collidedVert = i;
+        if collidedHoriz == pygame.Rect(0,0,0,0):
             self.rect.x = horizRect.x
-        if collidedVert:
+        else:
+            if self.rect.x < collidedHoriz.x:
+                self.rect.x = collidedHoriz.x - self.rect.w
+            else:
+                self.rect.x = collidedHoriz.x + collidedHoriz.w
+        if collidedVert == pygame.Rect(0,0,0,0):
             self.rect.y = vertRect.y
+        else:
+            if self.rect.y < collidedVert.y:
+                self.rect.y = collidedVert.y - self.rect.h
+            else:
+                self.rect.y = collidedVert.y + collidedVert.h
         for i in level.objects:
             if i.rect.colliderect(self.rect) and justPressed == pygame.K_e:
                 i.interact()
@@ -88,9 +100,11 @@ map.load_map_objects(l)
 l.addWall(pygame.Rect(10,10,64,64))
 l.addWall(pygame.Rect(100,100,64,64))
 l.addWall(pygame.Rect(200,200,100,64))
+l.addObject(map.TulipField(pygame.Rect(500,500,640,64)))
 camera = pygame.Rect(0,0,display_width,display_height)
 baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
 clock = pygame.time.Clock()
+
 while not crashed:
     keyDown = False
     for event in pygame.event.get():
@@ -108,12 +122,10 @@ while not crashed:
         l.update(camera)
     else:
         surf,rect = meleeSans.render(l.reading,fgcolor = white,bgcolor = black,size = 100)  
-
         render(sign,pygame.Rect(10,10,display_width - 20, display_height - 20),0,baseCamera)
         render(surf,pygame.Rect(30,30,rect.w,rect.h),0,baseCamera)
         if (justPressed == pygame.K_e):
             l.reading = ""
-
     camera.x = r.rect.x + r.rect.w/2 - camera.w/2
     camera.y = r.rect.y + r.rect.h/2 - camera.h/2
     

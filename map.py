@@ -1,5 +1,6 @@
 import pygame
 import json
+import random
 
 ###########
 # You should move this code into main or another python file
@@ -27,12 +28,17 @@ class State:
         if not State.instance:
             State.instance = self
 
+
+
 ########
+
+    
 
 class Interactable:  #parent class of anything that can be interacted with
     def __init__(self,rect, spritePath):
         self.rect = rect
-        self.img = pygame.image.load(spritePath)
+        if spritePath != None:
+            self.img = pygame.image.load(spritePath)
     def update(self,camera):
         import main
         main.render(self.img,self.rect,0,camera)
@@ -46,6 +52,18 @@ class Sign(Interactable):
     def interact(self):
         from main import l
         l.reading = self.message
+
+class TulipField(Interactable):
+    tulips = []
+    curTulip = -1
+    def __init__(self,rect):
+        Interactable.__init__(self,rect,None)
+        for i in range(20):
+            self.tulips.append((random.randint(rect.x,rect.x + rect.w),random.randint(rect.y,rect.y + rect.h)))
+    def update(self,camera):
+        import main
+        for i in self.tulips:
+            main.render(main.tulipImg,pygame.Rect(i[0],i[1],64,64),0,camera)
 
 def load_map_objects(level):
     f = open('map.json') 
