@@ -178,7 +178,6 @@ class Game:
         elif(self.state == GameStates.park):
 
             self.display.fill((0,0,0,0))
-
             
             self.player.update(self.level, self.camera, self.clock, self.justPressed)
 
@@ -186,8 +185,6 @@ class Game:
             
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
             self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
-            ##
-            self.render(bush_img,pygame.Rect(200,700,64,64),0,self.camera)
 
             pygame.display.update()
             self.clock.tick(120)
