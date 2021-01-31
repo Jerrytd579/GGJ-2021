@@ -62,6 +62,7 @@ class Game:
         TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
         for tree in TREES:
             self.level.addWall(pygame.Rect(tree[0] * TL_SZ, tree[1] * TL_SZ, TL_SZ, TL_SZ))
+
         #Bushes
         BUSHES = ((2,3),(21,2),(2,14),(13,21),(16,18),(19,18),(29,4),(45,6),(38,17),(28,24),(28,34),(6,30))
         for bush in BUSHES:
@@ -81,7 +82,7 @@ class Game:
     def draw_scene_park(self):
         self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
-        if((2 not in self.colored_areas) and self.player.flags['color_area_1']):
+        if((2 not in self.colored_areas) and self.player.flags['color_area_2']):
             self.level.reloadTilemap(2, True)
             self.colored_areas.append(2)
 
@@ -102,10 +103,9 @@ class Game:
             self.colored_areas.append(6)
 
         for obj in self.level.objects:
-            if(obj.rect.y <= self.player.rect.y + self.player.rect.h):
-                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
+                self.render(obj.img, obj.rect, 0,self.camera)
             
-            self.render(obj.img, obj.rect, 0,self.camera)
+        self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)    
 
         if(self.player.reading != ""):
             surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)  

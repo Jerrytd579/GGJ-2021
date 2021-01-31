@@ -58,10 +58,12 @@ def loadMapObjects(level):
             s.index = s.index = random.randint(0,4)
             while(s.index in used_button_indices):
                 s.index = random.randint(0,4)
+            
+            used_button_indices.append(s.index)
+
+            s.grayscale()
 
             level.addObject(s)
-    
-    level.objects.sort(key=lambda obj: obj.rect.y)
 
 class Level:
     walls = []
@@ -72,9 +74,10 @@ class Level:
         loadMapObjects(self)
 
 
-    def reloadTilemap(self, area_count, use_gray):
-        for x in range(2, area_count+1):
-            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', use_gray, self.tilemap)
+    def reloadTilemap(self, area_count):
+        self.tilemap = loadTilemapAsSurface('map_data/map_Layer1.csv')
+        for x in range(6, area_count):
+            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', True, self.tilemap)
 
     def addWall(self, wall):
         self.walls.append(wall)
@@ -91,13 +94,16 @@ class Interactable:  #parent class of anything that can be interacted with
             self.img = pygame.image.load(spritePath)
         else:
             self.img = None
-    def grayscale(self):
+    def grayscale(self, setGray=True):
         if (self.spritePath != None):
-            #print(self.spritePath)
-            grayscale = "sprites_grey" + self.spritePath[self.spritePath.find("/"): -4] +  "_g.png"
-            if (os.path.isfile(grayscale)):
-                self.img = pygame.image.load(grayscale)
-        #self.img = pygame.image.load()
+            if(setGray):
+                #print(self.spritePath)
+                grayscale = "sprites_grey" + self.spritePath[self.spritePath.find("/"): -4] +  "_g.png"
+                if (os.path.isfile(grayscale)):
+                    self.img = pygame.image.load(grayscale)
+            else:
+                self.img = pygame.image.load(self.spritePath)
+            
 
     def interact(self,dude):
         print("Blank interact function")
@@ -124,6 +130,24 @@ class Button(Interactable):
         self.enableFlag = enableFlag
         self.enabled = False
         self.index = -1
+
+    def interact(self, dude):
+        if(not self.enabled):
+            self.grayscale()
+            print(f"{self.index} : {dude.flags['current_index']}")
+            if(not dude.flags['trees_complete'] and dude.flags['current_index'] == self.index):
+                dude.flags[f"button_{self.enableFlag}"] = True
+                self.enabled = True
+                dude.flags['current_index'] += 1
+                self.grayscale(False)
+            else:
+                for x in range(0, dude.flags['current_index']):
+                    dude.flags[f"button_{x}"] = False
+                    dude.flags['current_index'] = 0
+
+            if(dude.flags['current_index'] == 4):
+                dude.flags['trees_complete'] = True
+
 #dylan
 class Sprite(Interactable):
     def __init__(self, rect, spritePath):
@@ -215,17 +239,3 @@ class TulipField:
         else:
             import game
             self.game.state = game.GameStates.park
-def load_map_objects(level):
-    f = open('map.json') 
-    map_dict = json.load(f)
-
-    for string in map_dict:
-        obj = map_dict[string]
-        if(obj['type'].lower() == "sign"):
-            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
-            s = Sign(obj['message'], interact, obj['sprite'])
-            
-            level.addObject(s)
-            
-            
-            
