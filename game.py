@@ -6,6 +6,8 @@ from player import Dude
 from enum import Enum
 from map import Level, TulipField
 
+TL_SZ = 32 # TILE SIZE
+
 class GameStates(Enum):
     menu = 0
     park = 1
@@ -40,10 +42,20 @@ class Game:
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
         self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
 
-        self.level.addWall(pygame.Rect(10,10,64,64))
-        self.level.addWall(pygame.Rect(100,100,64,64))
-        self.level.addWall(pygame.Rect(200,200,100,64))
-        self.level.addObject(TulipField(pygame.Rect(300,300,640,256),self))
+        WATERWALL = ((11,6),(9,10),(7,12),(6,13),(6,14),(5,16),(5,16),(5,16),(5,16),(6,15),(6,14),(6,14),(7,11),(8,9),(8,7),(9,5))
+        for x,y in enumerate(range(3,19)):
+            self.level.addWall(pygame.Rect(WATERWALL[x][0] * TL_SZ, y * TL_SZ, WATERWALL[x][1] * TL_SZ, TL_SZ))
+
+        #Outer walls
+        self.level.addWall(pygame.Rect(0, 0, 50 * TL_SZ, TL_SZ))
+        self.level.addWall(pygame.Rect(0, 41 * TL_SZ, 51 * TL_SZ, TL_SZ))
+        self.level.addWall(pygame.Rect(0, TL_SZ, TL_SZ, 40 * TL_SZ))
+        self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
+
+        #Trees
+        TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
+        for tree in TREES:
+            self.level.addWall(pygame.Rect(tree[0] * TL_SZ, tree[1] * TL_SZ, TL_SZ, TL_SZ))
         
     def should_stop(self):
         return self.running
