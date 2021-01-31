@@ -6,6 +6,15 @@ import random
 
 from map_data.tile_set import tile_images as color_tiles
 from map_data.tile_set_gray import tile_images as gray_tiles
+# gray_tiles = {}
+for i in color_tiles:
+    # grayscale = ("sprites_grey" + color_tiles[i][color_tiles[i].find("/"): -4] +  "_g.png")
+    # if os.path.isfile(grayscale):
+        # gray_tiles[i] = pygame.image.load(grayscale)
+    # else:
+        # print(grayscale)
+
+    color_tiles[i] = pygame.image.load(color_tiles[i])
 
 def loadTilemapAsSurface(tilemap_path, use_gray_tileset=False, use_surface=None):
     map_surface = None
@@ -29,7 +38,10 @@ def loadTilemapAsSurface(tilemap_path, use_gray_tileset=False, use_surface=None)
         for x in range(0,50):
             tile = int(tiles[(y * 50) + x])
             if(tile > 0 and tile < len(tile_imgs)):
-                map_surface.blit(pygame.transform.scale(tile_imgs[tile], (32,32)), (x*32, y*32))
+                if (tile not in tile_imgs):
+                    map_surface.blit(pygame.transform.scale(color_tiles[tile], (32,32)), (x*32, y*32))
+                else:
+                    map_surface.blit(pygame.transform.scale(tile_imgs[tile], (32,32)), (x*32, y*32))
 
     return map_surface
 
@@ -68,13 +80,13 @@ class Level:
     objects = [] #anything that can be interacted with
 
     def __init__(self):
-        self.tilemap = loadTilemapAsSurface('map_data/map_Layer1.csv')
+        self.tilemap = loadTilemapAsSurface('map_data/map_Layer1.csv',True)
         loadMapObjects(self)
 
 
-    def reloadTilemap(self, area_count, use_gray):
+    def reloadTilemap(self, area_count):
         for x in range(2, area_count+1):
-            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', use_gray, self.tilemap)
+            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', False, self.tilemap)
 
     def addWall(self, wall):
         self.walls.append(wall)
@@ -101,6 +113,15 @@ class Interactable:  #parent class of anything that can be interacted with
 
     def interact(self,dude):
         print("Blank interact function")
+
+class Bench(Interactable):
+    def __init__(self, rect,game):
+        Interactable.__init__(self,rect,"objects/bench.png")
+        self.game = game
+    def interact(self, dude):
+        self.game.finish()
+        open("finished.txt", "x")
+        
 
 class Sign(Interactable):
     def __init__(self, message, rect, spritePath):
