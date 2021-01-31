@@ -49,7 +49,7 @@ class Game:
         return self.running
 
     @staticmethod
-    def blitToSurface(surface, img, rect, angle,camera): #in case other objects want to blit to a surface
+    def blitToSurface(surface, img, rect, angle, camera): #in case other objects want to blit to a surface
         surface.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
     
     def render(self, img, rect, angle,camera):

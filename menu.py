@@ -35,6 +35,7 @@ def menu_state(screen, font, clock):
                 pos = pygame.mouse.get_pos()
                 if rect2.collidepoint(pos):
                     pygame.quit()
+                    sys.exit()
                 elif rect1.collidepoint(pos):
                     pygame.mixer.music.stop()
 

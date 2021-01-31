@@ -1,3 +1,4 @@
+import sys
 from game import *
 import pygame
 
@@ -7,4 +8,4 @@ while g.should_stop():
     g.update()
 
 pygame.quit()
-quit()
+sys.exit()
