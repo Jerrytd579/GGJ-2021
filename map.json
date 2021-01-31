@@ -1,7 +1,7 @@
 {
     "tree" : {
         "type": "sign",
-        "sprite" : "sprites/tree.png",
+        "sprite" : "sprites/gate_left.png",
         "message": "Welcome to The Park.\n We hope you enjoy your stay.",
         "interact_range" : {
             "x" : 100,
