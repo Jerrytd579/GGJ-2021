@@ -2,7 +2,7 @@
     "button1" : {
         "type": "button",
         "sprite" : "objects/tree.png",
-        "enable_flag": 1,
+        "enable_flag": 0,
         "interact_range" : {
             "x" : 80,
             "y" : 1024,
@@ -14,7 +14,7 @@
     "button2" : {
         "type": "button",
         "sprite" : "objects/tree.png",
-        "enable_flag": 2,
+        "enable_flag": 1,
         "interact_range" : {
             "x" : 368,
             "y" : 864,
@@ -26,7 +26,7 @@
     "button3" : {
         "type": "button",
         "sprite" : "objects/tree.png",
-        "enable_flag": 3,
+        "enable_flag": 2,
         "interact_range" : {
             "x" : 560,
             "y" : 832,
@@ -38,7 +38,7 @@
     "button4" : {
         "type": "button",
         "sprite" : "objects/tree.png",
-        "enable_flag": 4,
+        "enable_flag": 3,
         "interact_range" : {
             "x" : 528,
             "y" : 1056,
@@ -50,7 +50,7 @@
     "button5" : {
         "type": "button",
         "sprite" : "objects/tree.png",
-        "enable_flag": 5,
+        "enable_flag": 4,
         "interact_range" : {
             "x" : 336,
             "y" : 1088,
