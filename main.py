@@ -1,6 +1,6 @@
 import sys
 from game import *
-import pygame
+import pygame, sys
 
 
 g = Game(1280,720)
