@@ -40,11 +40,20 @@ def loadMapObjects(level):
         if(obj['type'].lower() == "sign"):
             interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
             s = Sign(obj['message'], interact, obj['sprite'])
+            level.addObject(s)
+    
+        if(obj['type'].lower() == "button"):
+            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
             
+            s = None
+            if("sprite" not in obj):
+                s = Button(obj['enable_flag'], interact, None)
+            else:
+                s = Button(obj['enable_flag'], interact, obj['sprite'])
+
             level.addObject(s)
 
 class Level:
-    reading = ""
     walls = []
     objects = [] #anything that can be interacted with
 
@@ -53,8 +62,9 @@ class Level:
         loadMapObjects(self)
 
 
-    def reloadTilemap(self, path, use_gray):
-        self.tilemap = loadTilemapAsSurface(path, use_gray, self.tilemap)
+    def reloadTilemap(self, area_count, use_gray):
+        for x in range(2, area_count+1):
+            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', use_gray, self.tilemap)
 
     def addWall(self, wall):
         self.walls.append(wall)
@@ -71,9 +81,10 @@ class Interactable:  #parent class of anything that can be interacted with
             self.img = pygame.image.load(spritePath)
         else:
             self.img = None
-    def update(self,camera):
-        import main
-        main.render(self.img,self.rect,0,camera)
+
+    def update(self,level):
+        pass
+
     def interact(self,dude):
         print("Blank interact function")
 
@@ -82,8 +93,7 @@ class Sign(Interactable):
         Interactable.__init__(self, rect, spritePath)
         self.message = message
     def interact(self,dude):
-        from main import l
-        l.reading = self.message
+        dude.reading = self.message
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
@@ -99,11 +109,18 @@ class Button(Interactable):
         Interactable.__init__(self, rect, spritePath)
         self.enableFlag = enableFlag
         self.enabled = False
-    
+        self.index = -1
+
     def interact(self, dude):
         if(not self.enabled):
-            dude.flags[self.enabledFlag] = True
-            self.enabled = True
+            if(dude.flags['current_index'] == self.index):
+                dude.flags[f"button_{self.enableFlag}"] = True
+                self.enabled = True
+                dude.flags['current_index'] += 1
+            else:
+                for x in range(0, dude.flags['current_index']):
+                    dude.flags[f"button_{x}"] = False
+                    dude.flags['current_index'] = 0
 
 class TulipField:
     curTulip = []
