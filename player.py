@@ -90,5 +90,9 @@ class Dude:
         if collidedVert:
             self.rect.y = vertRect.y
         for i in level.objects:
+<<<<<<< HEAD
             if i.rect.colliderect(self.rect) and keys[pygame.K_e]:
+=======
+            if i.rect.colliderect(self.rect) and pressed == pygame.K_e:
+>>>>>>> 97ef72fd853742d3e4c7171f3e91d53d4f4d706a
                 i.interact(self)
