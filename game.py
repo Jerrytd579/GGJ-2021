@@ -36,7 +36,7 @@ class Game:
         self.camera = pygame.Rect(0,0,w,h)
         self.baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
         self.clock = pygame.time.Clock()
-        self.player = Dude(pygame.Rect(w * 0.5, h - 64, 64,64))
+        self.player = Dude(pygame.Rect(w * 0.5 + 16, h - 24, 40,24))
         self.level = Level()
 
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
@@ -87,7 +87,7 @@ class Game:
                         if(obj.rect.y < self.player.rect.y):
                             self.render(obj.img, obj.rect, 0,self.camera)
 
-                        self.render(self.player.img, self.player.rect, 0,self.camera)
+                        self.render(self.player.img, pygame.Rect(self.player.rect[0] - 16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
                         if(obj.rect.y > self.player.rect.y):
                                 self.render(obj.img, obj.rect, 0)
@@ -131,7 +131,7 @@ class Game:
                 if(obj.rect.y < self.player.rect.y):
                     self.render(obj.img, obj.rect, 0,self.camera)
 
-                self.render(self.player.img, self.player.rect, 0,self.camera)
+                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
                 if(obj.rect.y > self.player.rect.y):
                     self.render(obj.img, obj.rect, 0,self.camera)
