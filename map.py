@@ -4,29 +4,55 @@ import random
 import os.path
 import random
 
-
-
-def loadTilemapAsSurface(tilemap_path, use_gray_tileset=False, use_surface=None):
-    pass
-
 def loadMapObjects(level):
-    pass
+    f = open('map.json') 
+    map_dict = json.load(f)
+
+    used_button_indices = []
+
+    for string in map_dict:
+        obj = map_dict[string]
+        if(obj['type'].lower() == "sign"):
+            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
+            s = Sign(obj['message'], interact, obj['sprite'])
+            level.addObject(s)
+    
+        if(obj['type'].lower() == "button"):
+            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
+            
+            s = None
+            if("sprite" not in obj):
+                s = Button(obj['enable_flag'], interact, None)
+            else:
+                s = Button(obj['enable_flag'], interact, obj['sprite'])
+
+            s.index = s.index = random.randint(0,4)
+            while(s.index in used_button_indices):
+                s.index = random.randint(0,4)
+            
+            used_button_indices.append(s.index)
+
+            s.grayscale(True)
+
+            level.addObject(s)
 
 class Level:
     walls = []
     objects = [] #anything that can be interacted with
-    active_stages = [1, 2, 3, 4]
+    map_img = None
     map_layers = [pygame.image.load('sprites/color_map.png'), pygame.image.load('sprites/quad_1.png'), pygame.image.load('sprites/quad_2.png'), pygame.image.load('sprites/quad_3.png'), pygame.image.load('sprites/quad_4.png')]
 
     def __init__(self):
-
-        self.tilemap = loadTilemapAsSurface('map_data/map_Layer1.csv',True)
+        self.map_img = pygame.Surface((1600,1344))
+        for layer in self.map_layers:
+            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
+        
         loadMapObjects(self)
 
-
-    def reloadTilemap(self, area_count):
-        for x in range(2, area_count+1):
-            self.tilemap = loadTilemapAsSurface(f'map_data/map_Layer{x}.csv', False, self.tilemap)
+    def update_mapimg(self, index):
+        self.map_layers.pop(index)
+        for layer in self.map_layers:
+            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
 
     def addWall(self, wall):
         self.walls.append(wall)
@@ -75,7 +101,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,"sprites_grey/grass_flower2.png")
+        Interactable.__init__(self,rect,"sprites/grass_flower2.png")
         self.game = game
     def interact(self,dude):
         import game
@@ -115,8 +141,8 @@ class Sprite(Interactable):
         if(not self.enabled):
             if(not dude.flags['trees_complete'] and dude.flags['current_index'] == self.index):
                 dude.flags[f"button_{self.enableFlag}"] = True
-                self.enabled = True
                 dude.flags['current_index'] += 1
+                self.grayscale(False)
             else:
                 for x in range(0, dude.flags['current_index']):
                     dude.flags[f"button_{x}"] = False

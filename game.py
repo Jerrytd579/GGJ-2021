@@ -43,7 +43,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.player = Dude(pygame.Rect(w * 0.5 + 16, h - 24, 32,24))
         self.level = map.Level()
-        self.finishImage = pygame.image.load("sprites/njit-endscreen.png")
+        self.notUpdated = True
 
         if (os.path.isfile("finished.txt")):
             self.finish()
@@ -93,13 +93,11 @@ class Game:
 
     def draw_scene_park(self):
         
-        if(self.player.flags['color_area_4'] and 4 in self.level.active_stages):
-            self.level.active_stages.remove(4)
+        if(self.player.flags['color_area_4'] and self.notUpdated):
+            self.level.update_mapimg(4)
+            self.notUpdated = False
 
-        self.render(self.level.map_layers[0], pygame.Rect(0, 0, 1600,1344), 0,self.camera)
-
-        for stage in self.level.active_stages:
-            self.render(self.level.map_layers[stage], pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+        self.render(self.level.map_img, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
 
         for obj in self.level.objects:
@@ -119,12 +117,12 @@ class Game:
                     self.state = GameStates.textbox
 
                 if(event.key == pygame.K_2):
-                    self.level.active_stages.remove(1)
+                    self.level.update_mapimg(1)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.justClicked = True
             elif event.type == pygame.QUIT:
-                    self.running = False
+                self.running = False
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
                 self.state = GameStates.park
@@ -136,14 +134,7 @@ class Game:
                 for x in range(0, 255):
                     fade.set_alpha(255-x)
 
-                    
-
-                    #Don't need ordered rendering here since you arent overlapping anything at the start
-                    for obj in self.level.objects:
-                        if (obj.img != None):
-                            self.render(obj.img, obj.rect, 0,self.camera)
-
-                    self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
+                    self.draw_scene_park()
 
                     self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
                     pygame.display.flip()
@@ -164,7 +155,7 @@ class Game:
                     elif(event.key == pygame.K_RETURN):
                         #check that cypher is correct
                         if(self.entered_text == ""):
-                            self.level.active_stages.remove(2)
+                            self.level.update_mapimg(2)
                             self.entered_text = ""
                             self.state = GameStates.park
                         
