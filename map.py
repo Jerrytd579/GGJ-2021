@@ -83,11 +83,11 @@ class Interactable:  #parent class of anything that can be interacted with
 
 class Bench(Interactable):
     def __init__(self, rect,game):
-        Interactable.__init__(self,rect,None)
+        Interactable.__init__(self,rect,"objects/bench.png")
         self.game = game
     def interact(self, dude):
-        if (len(self.game.level.map_layers) == 1):
-            self.game.finish()
+        self.game.finish()
+        open("finished.txt", "x")
         
 
 class Sign(Interactable):
@@ -99,7 +99,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,"sprites/grass_flower2.png")
+        Interactable.__init__(self,rect,None)
         self.game = game
     def interact(self,dude):
         import game
@@ -114,17 +114,16 @@ class Button(Interactable):
 
     def interact(self, dude):
         if(not dude.flags[f"button_{self.enableFlag}"]):
-            print(f"{self.index} : {dude.flags['current_index']}")
-            if(not dude.flags['trees_complete'] and dude.flags['current_index'] == self.index):
+            if(dude.flags['current_index'] == self.index and not dude.flags['trees_complete']):
                 dude.flags[f"button_{self.enableFlag}"] = True
                 dude.flags['current_index'] += 1
-            else:
-                self.enabled = False
-                for x in range(1, dude.flags['current_index']):
+            elif(dude.flags['current_index'] != self.index):
+                for x in range(1, 5):
                     dude.flags[f"button_{x}"] = False
-                    dude.flags['current_index'] = 0
+                
+                dude.flags['current_index'] = 0
 
-            if(dude.flags['current_index'] > 4):
+            if(dude.flags['current_index'] == 4):
                 dude.flags['trees_complete'] = True
 
 #dylan
