@@ -124,6 +124,10 @@ class Button(Interactable):
         self.enableFlag = enableFlag
         self.enabled = False
         self.index = -1
+#dylan
+class Sprite(Interactable):
+    def __init__(self, rect, spritePath):
+        Interactable.__init__(self, rect, spritePath)
 
     def interact(self, dude):
         if(not self.enabled):

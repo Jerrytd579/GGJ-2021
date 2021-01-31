@@ -7,6 +7,8 @@ from enum import Enum
 import map
 
 TL_SZ = 32 # TILE SIZE
+bush_img = pygame.image.load("objects/bush.png")
+
 
 class GameStates(Enum):
     menu = 0
@@ -27,7 +29,7 @@ class Game:
 
         self.display_size = (w,h)
         self.display = pygame.display.set_mode((w,h))
-        pygame.display.set_caption('hehe game')
+        pygame.display.set_caption('Simple Things')
         self.font = pygame.freetype.Font("MeleeSans.ttf")
         
         self.running = True
@@ -37,7 +39,7 @@ class Game:
         self.camera = pygame.Rect(0,0,w,h)
         self.baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
         self.clock = pygame.time.Clock()
-        self.player = Dude(pygame.Rect(w * 0.5, h - 64, 64,64))
+        self.player = Dude(pygame.Rect(w * 0.5 + 16, h - 24, 32,24))
         self.level = map.Level()
 
 
@@ -60,6 +62,11 @@ class Game:
         TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
         for tree in TREES:
             self.level.addWall(pygame.Rect(tree[0] * TL_SZ, tree[1] * TL_SZ, TL_SZ, TL_SZ))
+        #Bushes
+        BUSHES = ((2,3),(21,2),(2,14),(13,21),(16,18),(19,18),(29,4),(45,6),(38,17),(28,24),(28,34),(6,30))
+        for bush in BUSHES:
+            self.level.addWall(pygame.Rect(bush[0] * TL_SZ + 4, bush[1] * TL_SZ + 4, 56, 56))
+        self.level.addWall(pygame.Rect(42 * TL_SZ + 16, 15 * TL_SZ + 8, 44, 52))
         
     def should_stop(self):
         return self.running
@@ -172,6 +179,8 @@ class Game:
             
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
             self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
+            ##
+            self.render(bush_img,pygame.Rect(200,700,64,64),0,self.camera)
 
             pygame.display.update()
             self.clock.tick(120)
