@@ -4,78 +4,13 @@ import random
 import os.path
 import random
 
-from map_data.tile_set import tile_images as color_tiles
-from map_data.tile_set_gray import tile_images as gray_tiles
-# gray_tiles = {}
-for i in color_tiles:
-    # grayscale = ("sprites_grey" + color_tiles[i][color_tiles[i].find("/"): -4] +  "_g.png")
-    # if os.path.isfile(grayscale):
-        # gray_tiles[i] = pygame.image.load(grayscale)
-    # else:
-        # print(grayscale)
 
-    color_tiles[i] = pygame.image.load(color_tiles[i])
 
 def loadTilemapAsSurface(tilemap_path, use_gray_tileset=False, use_surface=None):
-    map_surface = None
-
-    if(use_surface != None):
-        map_surface = use_surface
-    else:
-        map_surface = pygame.Surface((1600,1344))
-
-    tilemap = open(tilemap_path, 'r')
-    tiles = tilemap.read().replace('\n',',').split(',')
-    tilemap.close()
-    tile_imgs = None
-
-    if(use_gray_tileset):
-        tile_imgs = gray_tiles    
-    else:
-        tile_imgs = color_tiles
-
-    for y in range(0, 42):
-        for x in range(0,50):
-            tile = int(tiles[(y * 50) + x])
-            if(tile > 0 and tile < len(tile_imgs)):
-                if (tile not in tile_imgs):
-                    map_surface.blit(pygame.transform.scale(color_tiles[tile], (32,32)), (x*32, y*32))
-                else:
-                    map_surface.blit(pygame.transform.scale(tile_imgs[tile], (32,32)), (x*32, y*32))
-
-    return map_surface
+    pass
 
 def loadMapObjects(level):
-    f = open('map.json') 
-    map_dict = json.load(f)
-
-    used_button_indices = []
-
-    for string in map_dict:
-        obj = map_dict[string]
-        if(obj['type'].lower() == "sign"):
-            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
-            s = Sign(obj['message'], interact, obj['sprite'])
-            level.addObject(s)
-    
-        if(obj['type'].lower() == "button"):
-            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
-            
-            s = None
-            if("sprite" not in obj):
-                s = Button(obj['enable_flag'], interact, None)
-            else:
-                s = Button(obj['enable_flag'], interact, obj['sprite'])
-
-            s.index = s.index = random.randint(0,4)
-            while(s.index in used_button_indices):
-                s.index = random.randint(0,4)
-            
-            used_button_indices.append(s.index)
-
-            s.grayscale()
-
-            level.addObject(s)
+    pass
 
 class Level:
     walls = []
@@ -124,11 +59,11 @@ class Interactable:  #parent class of anything that can be interacted with
 
 class Bench(Interactable):
     def __init__(self, rect,game):
-        Interactable.__init__(self,rect,"objects/bench.png")
+        Interactable.__init__(self,rect,None)
         self.game = game
     def interact(self, dude):
-        self.game.finish()
-        open("finished.txt", "x")
+        if (len(self.game.level.map_layers) == 1):
+            self.game.finish()
         
 
 class Sign(Interactable):
@@ -140,7 +75,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,None)
+        Interactable.__init__(self,rect,"sprites_grey/grass_flower2.png")
         self.game = game
     def interact(self,dude):
         import game
