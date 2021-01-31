@@ -4,7 +4,7 @@ import pygame
 import pygame.freetype
 from player import Dude
 from enum import Enum
-from map import Level, TulipField
+import map
 
 TL_SZ = 32 # TILE SIZE
 
@@ -16,7 +16,6 @@ class GameStates(Enum):
 class Game:
     instance = None
     state = GameStates.menu
-    flags = {}
     sprites = {} # for map object sprites
 
     def __init__(self, w, h):
@@ -32,15 +31,18 @@ class Game:
         
         self.running = True
         self.justPressed = False
+        self.justClicked = False
         
         self.camera = pygame.Rect(0,0,w,h)
         self.baseCamera = pygame.Rect(0,0,1,1) #used for rendering things without worrying about the camera following in the player
         self.clock = pygame.time.Clock()
-        self.player = Dude(pygame.Rect(w * 0.5 + 16, h - 24, 40,24))
-        self.level = Level()
+        self.player = Dude(pygame.Rect(w * 0.5, h - 64, 64,64))
+        self.level = map.Level()
+
 
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
         self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
+
 
         WATERWALL = ((11,6),(9,10),(7,12),(6,13),(6,14),(5,16),(5,16),(5,16),(5,16),(6,15),(6,14),(6,14),(7,11),(8,9),(8,7),(9,5))
         for x,y in enumerate(range(3,19)):
@@ -51,7 +53,8 @@ class Game:
         self.level.addWall(pygame.Rect(0, 41 * TL_SZ, 51 * TL_SZ, TL_SZ))
         self.level.addWall(pygame.Rect(0, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
-
+        self.level.addObject(map.TulipInteractable(pygame.Rect(300,300,64,128),self))
+        self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
         #Trees
         TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
         for tree in TREES:
@@ -97,47 +100,58 @@ class Game:
                     self.clock.tick(127.5)
 
                 
-        elif(self.state == GameStates.park):
+        else:
             keyDown = False
+            self.justClicked = False
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:  
                     keyDown = True
-                    justPressed = event.key
-                else:
-                    if event.type == pygame.QUIT:
+                    self.justPressed = event.key
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.justClicked = True
+                elif event.type == pygame.QUIT:
                         self.running = False
 
             if (keyDown == False):
                 self.justPressed = None
-            
-            self.display.fill((0,0,0))
+            if (self.state == GameStates.park):
+                self.display.fill((0,0,0,0))
 
-            if (self.level.reading == ""):
-                self.player.update(self.level, self.camera, self.clock, self.justPressed)
+                if (self.level.reading == ""):
+                    self.player.update(self.level, self.camera, self.clock, self.justPressed)
 
+                else:
+                    surf, rect = self.font.render(self.level.reading,fgcolor = (1,1,1),bgcolor = (0,0,0),size = 100)  
+
+                    self.render(sign, pygame.Rect(10, 10, self.display_size[0] - 20, self.display_size[1] - 20), 0, self.baseCamera)
+                    self.render(surf, pygame.Rect(30, 30, rect.w, rect.h) , 0, self.baseCamera)
+                    if (self.justPressed == pygame.K_e):
+                        self.level.reading = ""
+
+                
+                self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+
+                #TODO: Add wall rendering here
+                for obj in self.level.objects:
+                    if(obj.rect.y < self.player.rect.y):
+                        self.render(obj.img, obj.rect, 0,self.camera)
+
+                    self.render(self.player.img, self.player.rect, 0,self.camera)
+
+                    if (obj.rect.y > self.player.rect.y):
+                        self.render(obj.img,obj.rect,0,self.camera)
+
+
+                self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
+                self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
             else:
-                surf, rect = self.font.render(self.level.reading,fgcolor = (1,1,1),bgcolor = (0,0,0),size = 100)  
-
-                self.render(sign, pygame.Rect(10, 10, self.display_size[0] - 20, self.display_size[1] - 20), 0, self.baseCamera)
-                self.render(surf, pygame.Rect(30, 30, rect.w, rect.h) , 0, self.baseCamera)
-                if (justPressed == pygame.K_e):
-                    self.level.reading = ""
-
-            
-            self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
-
-            #TODO: Add wall rendering here
-            for obj in self.level.objects:
-                if(obj.rect.y < self.player.rect.y):
-                    self.render(obj.img, obj.rect, 0,self.camera)
-
+                self.display.blit(self.tulips.img, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
+                self.display.blit(self.tulips.mask, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
+                self.tulips.update()
                 self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
                 if(obj.rect.y > self.player.rect.y):
                     self.render(obj.img, obj.rect, 0,self.camera)
 
-            self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
-            self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
-                
             pygame.display.update()
             self.clock.tick(120)
