@@ -111,7 +111,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,"sprites/tulip.png")
+        Interactable.__init__(self,rect,None)
         self.game = game
     def interact(self,dude):
         import game
@@ -160,9 +160,8 @@ class TulipField:
         self.mask.fill((0,0,0,0))
         self.tulipPerRow = 5#self.rect.w//self.dimen #number of tulips per row
         self.tulipPerCol = 5#self.rect.h//self.dimen #number of tulips per column
-        self.tulipImg = pygame.image.load("sprites/tulip.png")
-        self.curTulipImg = self.tulipImg.copy()
-        self.curTulipImg.fill((200,0,0,0), special_flags=pygame.BLEND_RGB_ADD)
+        self.tulipImg = pygame.image.load("objects/flower_g.png")
+        self.curTulipImg = pygame.image.load("objects/flower.png")
         self.game = game
         self.startPos = (self.rect.w//self.dimen//2 - self.tulipPerRow//2,self.rect.h//self.dimen//2 - self.tulipPerCol//2)
         for i in range(self.tulipPerRow):
@@ -205,7 +204,8 @@ class TulipField:
                     pos = (random.randrange(0,self.tulipPerRow),random.randrange(0,self.tulipPerCol))
                 pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
                 self.curTulip.append(pos)
-                self.game.blitToSurface(self.mask,self.curTulipImg,pygame.Rect(pos[0],pos[1],self.dimen,self.dimen),0,pygame.Rect(0,0,0,0))
+                self.showBlinks()
+                #self.game.blitToSurface(self.mask,self.curTulipImg,pygame.Rect(pos[0],pos[1],self.dimen,self.dimen),0,pygame.Rect(0,0,0,0))
                 self.game.display.blit(self.mask,pygame.Rect(0, 0, self.game.display_size[0], self.game.display_size[1])) 
                 pygame.display.update()
                 pygame.time.wait(2000) 

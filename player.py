@@ -14,6 +14,10 @@ class Dude:
         self.stopped = True
         self.flags = {
             'color_area_1' : False,
+            'color_area_3' : False,
+            'color_area_4': False,
+            'color_area_5': False,
+            'color_area_6': False,
             'trees_complete' : False,
             'current_index' : 0,
         }
