@@ -56,7 +56,7 @@ class Game:
         self.level.addWall(pygame.Rect(0, 41 * TL_SZ, 51 * TL_SZ, TL_SZ))
         self.level.addWall(pygame.Rect(0, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
-        self.level.addObject(map.TulipInteractable(pygame.Rect(300,300,64,128),self))
+        self.level.addObject(map.TulipInteractable(pygame.Rect(600,300,64,128),self))
         self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
         #Trees
         TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
@@ -115,6 +115,22 @@ class Game:
             self.display.blit(surf, pygame.Rect(10, 610, rect.w, rect.h))
 
     def update(self):
+        self.justPressed = None
+        self.justClicked = False
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:  
+                justPressed = event.key
+
+                if(event.key == pygame.K_1):
+                    self.state = GameStates.textbox
+
+                if(event.key == pygame.K_2):
+                    self.player.flags['color_area_1'] = True
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.justClicked = True
+            elif event.type == pygame.QUIT:
+                    self.running = False
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
                 self.state = GameStates.park
@@ -162,28 +178,8 @@ class Game:
             pygame.display.update()
 
         elif(self.state == GameStates.park):
-            keyDown = False
-            self.justClicked = False
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:  
-                    keyDown = True
-                    justPressed = event.key
 
-                    if(event.key == pygame.K_1):
-                        self.state = GameStates.textbox
-
-                    if(event.key == pygame.K_2):
-                        self.player.flags['color_area_1'] = True
-
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    self.justClicked = True
-                elif event.type == pygame.QUIT:
-                        self.running = False
-
-            if (keyDown == False):
-                self.justPressed = None
-            if (self.state == GameStates.park):
-                self.display.fill((0,0,0,0))
+            self.display.fill((0,0,0,0))
 
             if (self.player.reading == ""):
                 self.player.update(self.level, self.camera, self.clock, self.justPressed)
@@ -198,5 +194,11 @@ class Game:
             ##
             self.render(bush_img,pygame.Rect(200,700,64,64),0,self.camera)
 
+            pygame.display.update()
+            self.clock.tick(120)
+        elif self.state == GameStates.minigame:
+            self.render(self.tulips.img,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
+            self.render(self.tulips.mask,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
+            self.tulips.update()
             pygame.display.update()
             self.clock.tick(120)

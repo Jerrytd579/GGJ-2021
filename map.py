@@ -160,9 +160,8 @@ class TulipField:
         self.mask.fill((0,0,0,0))
         self.tulipPerRow = 5#self.rect.w//self.dimen #number of tulips per row
         self.tulipPerCol = 5#self.rect.h//self.dimen #number of tulips per column
-        self.tulipImg = pygame.image.load("sprites/tulip.png")
-        self.curTulipImg = self.tulipImg.copy()
-        self.curTulipImg.fill((200,0,0,0), special_flags=pygame.BLEND_RGB_ADD)
+        self.tulipImg = pygame.image.load("objects/flower_g.png")
+        self.curTulipImg = pygame.image.load("objects/flower.png")
         self.game = game
         self.startPos = (self.rect.w//self.dimen//2 - self.tulipPerRow//2,self.rect.h//self.dimen//2 - self.tulipPerCol//2)
         for i in range(self.tulipPerRow):
