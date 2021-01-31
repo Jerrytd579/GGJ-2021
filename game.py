@@ -104,8 +104,8 @@ class Game:
         for obj in self.level.objects:
             if(obj.rect.y <= self.player.rect.y + self.player.rect.h):
                 self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
-            
-            self.render(obj.img, obj.rect, 0,self.camera)
+            if (obj.img != None):
+                self.render(obj.img, obj.rect, 0,self.camera)
 
         if(self.player.reading != ""):
             surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)  
@@ -146,7 +146,8 @@ class Game:
 
                     #Don't need ordered rendering here since you arent overlapping anything at the start
                     for obj in self.level.objects:
-                        self.render(obj.img, obj.rect, 0,self.camera)
+                        if (obj.img != None):
+                            self.render(obj.img, obj.rect, 0,self.camera)
 
                     self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 

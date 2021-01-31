@@ -111,7 +111,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,"sprites/tulip.png")
+        Interactable.__init__(self,rect,None)
         self.game = game
     def interact(self,dude):
         import game
@@ -204,7 +204,8 @@ class TulipField:
                     pos = (random.randrange(0,self.tulipPerRow),random.randrange(0,self.tulipPerCol))
                 pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
                 self.curTulip.append(pos)
-                self.game.blitToSurface(self.mask,self.curTulipImg,pygame.Rect(pos[0],pos[1],self.dimen,self.dimen),0,pygame.Rect(0,0,0,0))
+                self.showBlinks()
+                #self.game.blitToSurface(self.mask,self.curTulipImg,pygame.Rect(pos[0],pos[1],self.dimen,self.dimen),0,pygame.Rect(0,0,0,0))
                 self.game.display.blit(self.mask,pygame.Rect(0, 0, self.game.display_size[0], self.game.display_size[1])) 
                 pygame.display.update()
                 pygame.time.wait(2000) 
