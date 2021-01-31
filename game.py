@@ -137,7 +137,8 @@ class Game:
                         self.render(obj.img, obj.rect, 0,self.camera)
 
                     self.render(self.player.img, self.player.rect, 0,self.camera)
-
+                    if (self.justPressed == pygame.K_g):
+                        obj.grayscale()
                     if (obj.rect.y > self.player.rect.y):
                         self.render(obj.img,obj.rect,0,self.camera)
 

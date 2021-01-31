@@ -1,6 +1,7 @@
 import pygame
 import json
 import random
+import os.path
 
 from map_data.tile_set import tile_images as color_tiles
 from map_data.tile_set_gray import tile_images as gray_tiles
@@ -65,15 +66,21 @@ class Level:
     
 
 class Interactable:  #parent class of anything that can be interacted with
+    spritePath = None
     def __init__(self, rect, spritePath):
         self.rect = rect
+        self.spritePath = spritePath
         if spritePath != None:
             self.img = pygame.image.load(spritePath)
         else:
             self.img = None
-    def update(self,camera):
-        import main
-        main.render(self.img,self.rect,0,camera)
+    def grayscale(self):
+        if (self.spritePath != None):
+            #print(self.spritePath)
+            grayscale = "sprites_grey" + self.spritePath[self.spritePath.find("/"): -4] +  "_g.png"
+            if (os.path.isfile(grayscale)):
+                self.img = pygame.image.load(grayscale)
+        #self.img = pygame.image.load()
     def interact(self,dude):
         print("Blank interact function")
 
