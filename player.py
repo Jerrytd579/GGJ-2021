@@ -13,7 +13,8 @@ class Dude:
         self.dir = 2
         self.stopped = True
         self.flags = {
-            'color_area_1':False,
+            'color_area_1' : False,
+            'trees_complete' : False,
             'current_index' : 0,
         }
         self.reading = ""

@@ -1,7 +1,7 @@
 {
     "tree" : {
         "type": "sign",
-        "sprite" : "sprites/tree.png",
+        "sprite" : "objects/tree.png",
         "message": "Welcome to The Park. We hope you enjoy your stay.",
         "interact_range" : {
             "x" : 0,
@@ -13,7 +13,7 @@
 
     "button1" : {
         "type": "button",
-        "sprite" : "sprites/tree.png",
+        "sprite" : "objects/tree.png",
         "enable_flag": 1,
         "interact_range" : {
             "x" : 1000,
@@ -25,11 +25,11 @@
 
     "button2" : {
         "type": "button",
-        "sprite" : "sprites/tree.png",
+        "sprite" : "objects/tree.png",
         "enable_flag": 2,
         "interact_range" : {
             "x" : 1100,
-            "y" : 150,
+            "y" : 151,
             "w" : 100,
             "h" : 100
         }
