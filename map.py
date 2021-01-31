@@ -93,6 +93,18 @@ class TulipInteractable(Interactable):
         import game
         self.game.state = game.GameStates.minigame
         self.game.display.fill((0,0,0,0))
+
+class Button(Interactable):
+    def __init__(self, enableFlag, rect, spritePath):
+        Interactable.__init__(self, rect, spritePath)
+        self.enableFlag = enableFlag
+        self.enabled = False
+    
+    def interact(self, dude):
+        if(not self.enabled):
+            dude.flags[self.enabledFlag] = True
+            self.enabled = True
+
 class TulipField:
     curTulip = []
     curCounter = []

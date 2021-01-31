@@ -6,6 +6,8 @@ from player import Dude
 from enum import Enum
 import map
 
+TL_SZ = 32 # TILE SIZE
+
 class GameStates(Enum):
     menu = 0
     park = 1
@@ -14,7 +16,6 @@ class GameStates(Enum):
 class Game:
     instance = None
     state = GameStates.menu
-    flags = {}
     sprites = {} # for map object sprites
 
     def __init__(self, w, h):
@@ -38,25 +39,37 @@ class Game:
         self.player = Dude(pygame.Rect(w * 0.5, h - 64, 64,64))
         self.level = map.Level()
 
+
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
         self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
 
-        self.level.addWall(pygame.Rect(10,10,64,64))
-        self.level.addWall(pygame.Rect(100,100,64,64))
-        self.level.addWall(pygame.Rect(200,200,100,64))
+
+        WATERWALL = ((11,6),(9,10),(7,12),(6,13),(6,14),(5,16),(5,16),(5,16),(5,16),(6,15),(6,14),(6,14),(7,11),(8,9),(8,7),(9,5))
+        for x,y in enumerate(range(3,19)):
+            self.level.addWall(pygame.Rect(WATERWALL[x][0] * TL_SZ, y * TL_SZ, WATERWALL[x][1] * TL_SZ, TL_SZ))
+
+        #Outer walls
+        self.level.addWall(pygame.Rect(0, 0, 50 * TL_SZ, TL_SZ))
+        self.level.addWall(pygame.Rect(0, 41 * TL_SZ, 51 * TL_SZ, TL_SZ))
+        self.level.addWall(pygame.Rect(0, TL_SZ, TL_SZ, 40 * TL_SZ))
+        self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addObject(map.TulipInteractable(pygame.Rect(300,300,64,128),self))
         self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
-        #self.state = 2
+        #Trees
+        TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
+        for tree in TREES:
+            self.level.addWall(pygame.Rect(tree[0] * TL_SZ, tree[1] * TL_SZ, TL_SZ, TL_SZ))
         
     def should_stop(self):
         return self.running
 
     @staticmethod
-    def blitToSurface(surface, img, rect, angle,camera): #in case other objects want to blit to a surface
+    def blitToSurface(surface, img, rect, angle, camera): #in case other objects want to blit to a surface
         surface.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
     
     def render(self, img, rect, angle,camera):
         self.blitToSurface(self.display,img,rect,angle,camera)
+
     def update(self):
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
@@ -77,7 +90,7 @@ class Game:
                         if(obj.rect.y < self.player.rect.y):
                             self.render(obj.img, obj.rect, 0,self.camera)
 
-                        self.render(self.player.img, self.player.rect, 0,self.camera)
+                        self.render(self.player.img, pygame.Rect(self.player.rect[0] - 16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
                         if(obj.rect.y > self.player.rect.y):
                                 self.render(obj.img, obj.rect, 0)
@@ -135,7 +148,10 @@ class Game:
                 self.display.blit(self.tulips.img, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
                 self.display.blit(self.tulips.mask, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
                 self.tulips.update()
+                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
+
+                if(obj.rect.y > self.player.rect.y):
+                    self.render(obj.img, obj.rect, 0,self.camera)
 
             pygame.display.update()
             self.clock.tick(120)
-
