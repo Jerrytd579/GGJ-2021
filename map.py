@@ -31,6 +31,7 @@ def loadMapObjects(level):
                 s.index = random.randint(0,4)
             
             used_button_indices.append(s.index)
+            s.grayscale()
 
             level.addObject(s)
 
@@ -67,11 +68,12 @@ class Interactable:  #parent class of anything that can be interacted with
             self.img = pygame.image.load(spritePath)
         else:
             self.img = None
+
     def grayscale(self, setGray=True):
         if (self.spritePath != None):
             if(setGray):
                 #print(self.spritePath)
-                grayscale = "sprites_grey" + self.spritePath[self.spritePath.find("/"): -4] +  "_g.png"
+                grayscale = "objects/" + os.path.basename(self.spritePath).replace(".png", "_g.png")
                 if (os.path.isfile(grayscale)):
                     self.img = pygame.image.load(grayscale)
             else:
@@ -83,11 +85,21 @@ class Interactable:  #parent class of anything that can be interacted with
 
 class Bench(Interactable):
     def __init__(self, rect,game):
-        Interactable.__init__(self,rect,"objects/bench.png")
+        Interactable.__init__(self,rect, None)
         self.game = game
     def interact(self, dude):
-        self.game.finish()
-        open("finished.txt", "x")
+        if(len(self.game.level.map_layers) == 1):
+            self.game.finish()
+            if(not os.path.isfile("completed.txt")):
+                open("completed.txt", "x")
+
+class Cypher(Interactable):
+    def __init__(self, rect,game):
+        Interactable.__init__(self,rect,"objects/flower_red.png")
+        self.game = game
+    def interact(self, dude):
+        import game
+        self.game.state = game.GameStates.textbox
         
 
 class Sign(Interactable):
@@ -117,13 +129,15 @@ class Button(Interactable):
             if(dude.flags['current_index'] == self.index and not dude.flags['trees_complete']):
                 dude.flags[f"button_{self.enableFlag}"] = True
                 dude.flags['current_index'] += 1
+                self.grayscale(False)
+
             elif(dude.flags['current_index'] != self.index):
-                for x in range(1, 5):
+                for x in range(0, 5):
                     dude.flags[f"button_{x}"] = False
                 
                 dude.flags['current_index'] = 0
 
-            if(dude.flags['current_index'] == 4):
+            if(dude.flags['current_index'] == 5):
                 dude.flags['trees_complete'] = True
 
 #dylan

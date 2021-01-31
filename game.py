@@ -23,7 +23,7 @@ class Game:
     state = GameStates.menu
     entered_text = ""
     sprites = {} # for map object sprites
-    colored_areas = []
+    finishedImage = pygame.image.load("sprites/njit-endscreen.png")
 
     def __init__(self, w, h):
         pygame.init()
@@ -44,9 +44,8 @@ class Game:
         self.player = Dude(pygame.Rect(w * 0.5 + 16, h - 24, 32,24))
         self.level = map.Level()
         self.notUpdated = True
-
-        if (os.path.isfile("finished.txt")):
-            self.finish()
+        self.notUpdatedTrees = True
+        self.clean_entry = 0
 
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
         self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
@@ -64,6 +63,7 @@ class Game:
         self.level.addObject(map.TulipInteractable(pygame.Rect(900,300,48,48),self))
         self.level.addObject(map.Wheel(pygame.Rect(1152, 736, 124, 88)))
         self.level.addObject(map.Bench(pygame.Rect(736,32,128,128),self))
+        self.level.addObject(map.Cypher(pygame.Rect(64,256,48,48), self))
         self.level.addWall(pygame.Rect(736, 32, 128, 64))
         self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
   
@@ -83,6 +83,30 @@ class Game:
     def finish(self):
         pygame.mixer_music.load('music/njit-endtheme.wav')
         pygame.mixer_music.play()
+
+        fade = pygame.Surface((self.display_size[0], self.display_size[1]))
+        self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+        fade.fill((0,0,0))
+
+        for x in range(0, 255):
+            fade.set_alpha(x)
+
+            self.draw_scene_park()
+
+            self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+            pygame.display.flip()
+            self.clock.tick(127.5)
+
+
+        for x in range(0, 255):
+            fade.set_alpha(255-x)
+
+            self.display.blit(self.finishedImage, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+            self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
+            pygame.display.flip()
+            self.clock.tick(127.5)
+
+
         self.state = GameStates.finished
     @staticmethod
     def blitToSurface(surface, img, rect, angle, camera): #in case other objects want to blit to a surface
@@ -97,10 +121,17 @@ class Game:
             self.level.update_mapimg(4)
             self.notUpdated = False
 
+        if(self.player.flags['trees_complete'] and self.notUpdatedTrees):
+            self.level.update_mapimg(3)
+            self.notUpdatedTrees = False
+
         self.render(self.level.map_img, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
-
         for obj in self.level.objects:
+            if(type(obj) == map.Button):
+                if(not self.player.flags[f'button_{obj.enableFlag}']):
+                    obj.grayscale()
+                
             if(obj.img != None):
                 self.render(obj.img, obj.rect, 0,self.camera)
             
@@ -146,32 +177,45 @@ class Game:
             pygame.draw.rect(self.display, (255,255,255), pygame.Rect((1280 / 2) - 460, (720 / 2) - 74, 920, 148))
             pygame.draw.rect(self.display, (0,0,0), pygame.Rect((1280 / 2) - 450, (720 / 2) - 64, 900, 128))
 
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if(event.key != pygame.K_RETURN and event.key != pygame.K_BACKSPACE):
-                        self.entered_text += pygame.key.name(event.key)
-                    elif(event.key == pygame.K_BACKSPACE):
-                        self.entered_text = self.entered_text[0:-1]
-                    elif(event.key == pygame.K_RETURN):
-                        #check that cypher is correct
-                        if(self.entered_text == ""):
-                            self.level.update_mapimg(2)
-                            self.entered_text = ""
-                            self.state = GameStates.park
-                        
-                        else:
-                            #TODO: play sfx when cypher wrong
-                            pass
+            if(self.clean_entry == 0):
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        if(event.key != pygame.K_RETURN and event.key != pygame.K_BACKSPACE and event.key != pygame.K_ESCAPE):
+                            if(event.key == pygame.K_SPACE):
+                                self.entered_text += " "
+                            else:
+                                self.entered_text += pygame.key.name(event.key)
+
+                        elif(event.key == pygame.K_BACKSPACE):
+                            self.entered_text = self.entered_text[0:-1]
+
+                        elif(event.key == pygame.K_RETURN):
+                            #check that cypher is correct
+                            if(self.entered_text == "what is lost can be found"):
+                                self.level.update_mapimg(2)
+                                self.entered_text = ""
+                                self.state = GameStates.park
+                            else:
+                                self.entered_text = "Hmm, not quite..."
+                                self.clean_entry = 25
+
+            elif(self.clean_entry == 1):
+                self.entered_text = ""
+                self.clean_entry -= 1
+            else:
+                self.clean_entry -= 1
                 
             surf, rect = self.font.render(self.entered_text, fgcolor = (255,255,255), size = 32)  
             self.display.blit(surf, pygame.Rect((1280 / 2) - 440, (720 / 2) - 54, rect.w, rect.h))
 
             #CYPHER TEXT DRAWN HERE, REPLACE plyer.reader WITH CYPHER TEXT
-            surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)              
+            surf, rect = self.font.render("Skip stones to the far shore, and by skipping stones return once more",fgcolor = (255,255,255), size = 32)    
+            surf2, rect2 = self.font.render("WDHNAUTOIFSELBONSATC",fgcolor = (255,255,255), size = 32)              
             
             pygame.draw.rect(self.display, (0,0,0), pygame.Rect(0, 600, 1280, 120))
             pygame.draw.rect(self.display, (255,255,255), pygame.Rect(0, 590, 1280, 10))
             self.display.blit(surf, pygame.Rect(10, 610, rect.w, rect.h))
+            self.display.blit(surf2, pygame.Rect(10, 650, rect2.w, rect2.h))
 
             pygame.display.update()
 
@@ -197,6 +241,6 @@ class Game:
             
         elif self.state == GameStates.finished:
 
-            #self.render(self.finishImage,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
+            self.render(self.finishedImage,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
             pygame.display.update()
             self.clock.tick(120)

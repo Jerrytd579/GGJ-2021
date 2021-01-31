@@ -13,6 +13,11 @@ class Dude:
         self.dir = 2
         self.stopped = True
         self.flags = {
+            'button_0' : False,
+            'button_1' : False,
+            'button_2' : False,
+            'button_3' : False,
+            'button_4' : False,
             'color_area_4' : False,
             'trees_complete' : False,
             'current_index' : 0,
