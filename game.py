@@ -1,6 +1,7 @@
 import math
 import menu
 import pygame
+import os.path
 import pygame.freetype
 from player import Dude
 from enum import Enum
@@ -15,6 +16,7 @@ class GameStates(Enum):
     park = 1
     minigame = 2
     textbox = 3
+    finished =4
 
 class Game:
     instance = None
@@ -43,6 +45,8 @@ class Game:
         self.level = map.Level()
         self.notUpdated = True
 
+        if (os.path.isfile("finished.txt")):
+            self.finish()
 
         self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
         self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
@@ -59,6 +63,7 @@ class Game:
         self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addObject(map.TulipInteractable(pygame.Rect(600,300,64,128),self))
         self.level.addObject(map.Wheel(pygame.Rect(900,900,128,128)))
+        self.level.addObject(map.Bench(pygame.Rect(800,0,128,128),self))
         self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
   
         #Trees
@@ -74,7 +79,10 @@ class Game:
         
     def should_stop(self):
         return self.running
-
+    def finish(self):
+        pygame.mixer_music.load('music/njit-endtheme.wav')
+        pygame.mixer_music.play()
+        self.state = GameStates.finished
     @staticmethod
     def blitToSurface(surface, img, rect, angle, camera): #in case other objects want to blit to a surface
         surface.blit(pygame.transform.rotate(pygame.transform.scale(img,(rect.w,rect.h)),angle), (rect.x - camera.x,rect.y - camera.y))
@@ -89,6 +97,7 @@ class Game:
             self.notUpdated = False
 
         self.render(self.level.map_img, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+
 
         for obj in self.level.objects:
             if(obj.img != None):
@@ -185,5 +194,10 @@ class Game:
             self.render(self.tulips.img,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
             self.render(self.tulips.mask,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
             self.tulips.update()
+            pygame.display.update()
+            self.clock.tick(120)
+        elif self.state == GameStates.finished:
+
+            self.render(self.finishImage,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
             pygame.display.update()
             self.clock.tick(120)
