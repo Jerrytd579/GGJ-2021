@@ -85,6 +85,17 @@ class Sign(Interactable):
         from main import l
         l.reading = self.message
 
+class Button(Interactable):
+    def __init__(self, enableFlag, rect, spritePath):
+        Interactable.__init__(self, rect, spritePath)
+        self.enableFlag = enableFlag
+        self.enabled = False
+    
+    def interact(self, dude):
+        if(not self.enabled):
+            dude.flags[self.enabledFlag] = True
+            self.enabled = True
+
 class TulipField(Interactable):
     tulips = []
     curTulip = -1
@@ -140,18 +151,3 @@ class TulipField(Interactable):
             self.curTulip = random.choice(tuple(self.tulipSet))
             self.correct += 1
         
-def load_map_objects(level):
-    f = open('map.json') 
-    map_dict = json.load(f)
-
-    for string in map_dict:
-        obj = map_dict[string]
-        if(obj['type'].lower() == "sign"):
-            interact = pygame.Rect(obj['interact_range']['x'], obj['interact_range']['y'],  obj['interact_range']['w'], obj['interact_range']['h'])
-            s = Sign(obj['message'], interact, obj['sprite'])
-            
-            level.addObject(s)
-            
-            
-            
-            

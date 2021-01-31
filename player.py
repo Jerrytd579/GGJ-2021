@@ -12,6 +12,7 @@ class Dude:
         self.frame_cooldown = 10
         self.dir = 2
         self.stopped = True
+        self.flags = {}
 
 
     def update(self, level, camera, clock, pressed):

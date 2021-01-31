@@ -16,7 +16,6 @@ class GameStates(Enum):
 class Game:
     instance = None
     state = GameStates.menu
-    flags = {}
     sprites = {} # for map object sprites
 
     def __init__(self, w, h):
