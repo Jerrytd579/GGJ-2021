@@ -83,11 +83,11 @@ class Interactable:  #parent class of anything that can be interacted with
 
 class Bench(Interactable):
     def __init__(self, rect,game):
-        Interactable.__init__(self,rect,"objects/bench.png")
+        Interactable.__init__(self,rect,None)
         self.game = game
     def interact(self, dude):
-        self.game.finish()
-        open("finished.txt", "x")
+        if (len(self.game.level.map_layers) == 1):
+            self.game.finish()
         
 
 class Sign(Interactable):
@@ -99,7 +99,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,None)
+        Interactable.__init__(self,rect,"sprites/grass_flower2.png")
         self.game = game
     def interact(self,dude):
         import game
