@@ -57,7 +57,9 @@ class Game:
         self.level.addWall(pygame.Rect(0, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addWall(pygame.Rect(49 * TL_SZ, TL_SZ, TL_SZ, 40 * TL_SZ))
         self.level.addObject(map.TulipInteractable(pygame.Rect(600,300,64,128),self))
+        self.level.addObject(map.Wheel(pygame.Rect(900,900,128,128)))
         self.tulips = map.TulipField(pygame.Rect(0,0,w,h),self)
+  
         #Trees
         TREES = ((4,21),(4,36),(13,31),(19,30),(12,38),(18,37))
         for tree in TREES:
@@ -119,8 +121,8 @@ class Game:
         self.justClicked = False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:  
-                justPressed = event.key
-
+                self.justPressed = event.key
+            
                 if(event.key == pygame.K_1):
                     self.state = GameStates.textbox
 
