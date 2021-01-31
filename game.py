@@ -132,8 +132,10 @@ class Game:
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    if(event.key != pygame.K_RETURN):
+                    if(event.key != pygame.K_RETURN and event.key != pygame.K_BACKSPACE):
                         self.entered_text += pygame.key.name(event.key)
+                    elif(event.key == pygame.K_BACKSPACE):
+                        self.entered_text = self.entered_text[0:-1]
                     else:
                         print("check riddles or whatever here")
                         self.entered_text = ""
