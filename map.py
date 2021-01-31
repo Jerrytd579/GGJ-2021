@@ -99,7 +99,7 @@ class Sign(Interactable):
 
 class TulipInteractable(Interactable):
     def __init__(self,rect,game):
-        Interactable.__init__(self,rect,"sprites/grass_flower2.png")
+        Interactable.__init__(self,rect,"objects/flower.png")
         self.game = game
     def interact(self,dude):
         import game
