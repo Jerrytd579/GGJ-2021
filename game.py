@@ -169,48 +169,16 @@ class Game:
             if (self.state == GameStates.park):
                 self.display.fill((0,0,0,0))
 
-<<<<<<< HEAD
             if (self.player.reading == ""):
                 self.player.update(self.level, self.camera, self.clock, self.justPressed)
             
             if (pygame.K_e in pygame.key.get_pressed()):
                 self.player.reading = ""
-=======
-                if (self.level.reading == ""):
-                    self.player.update(self.level, self.camera, self.clock, self.justPressed)
-
-                else:
-                    surf, rect = self.font.render(self.level.reading,fgcolor = (1,1,1),bgcolor = (0,0,0),size = 100)  
-
-                    self.render(sign, pygame.Rect(10, 10, self.display_size[0] - 20, self.display_size[1] - 20), 0, self.baseCamera)
-                    self.render(surf, pygame.Rect(30, 30, rect.w, rect.h) , 0, self.baseCamera)
-                    if (self.justPressed == pygame.K_e):
-                        self.level.reading = ""
-
-                
-                self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
-
-                #TODO: Add wall rendering here
-                for obj in self.level.objects:
-                    if(obj.rect.y < self.player.rect.y):
-                        self.render(obj.img, obj.rect, 0,self.camera)
-
-                    self.render(self.player.img, self.player.rect, 0,self.camera)
-
-                    if (obj.rect.y > self.player.rect.y):
-                        self.render(obj.img,obj.rect,0,self.camera)
-
-
-                self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
-                self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
-            else:
-                self.display.blit(self.tulips.img, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
-                self.display.blit(self.tulips.mask, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))   
-                self.tulips.update()
-                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
->>>>>>> 97ef72fd853742d3e4c7171f3e91d53d4f4d706a
 
             self.draw_scene_park()
+            
+            self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
+            self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
 
             pygame.display.update()
             self.clock.tick(120)
