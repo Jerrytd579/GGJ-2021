@@ -10,6 +10,8 @@ class Dude:
         self.img = self.front_imgs[0]
         self.frame = 0
         self.frame_cooldown = 10
+        self.dir = 2
+        self.stopped = True
 
 
     def update(self, level, camera, clock, pressed):
@@ -29,18 +31,45 @@ class Dude:
         elif keys[pygame.K_DOWN]:
             speeds[1] += velocity
 
+        if(speeds == [0,0] and not self.stopped):
+            if(self.dir == 0):
+                self.img = pygame.transform.flip(self.side_imgs[0], True, False)
+            
+            elif(self.dir == 1):
+                self.img = self.side_imgs[0]
+            
+            elif(self.dir == 2):
+                self.img = self.front_imgs[0]
+
+            elif(self.dir == 3):
+                self.img = self.back_imgs[0]
+            
+            self.stopped = True
+        
+        else:
+            self.stopped = False
+
+
         if(self.frame_cooldown == 0):
             if(speeds[0] > 0):
+                self.frame = ((self.frame + 1) % len(self.side_imgs))
                 self.img = pygame.transform.flip(self.side_imgs[self.frame], True, False)
+                self.dir = 0
             elif(speeds[0] < 0):
+                self.frame = ((self.frame + 1) % len(self.side_imgs))
                 self.img = self.side_imgs[self.frame]
+                self.dir = 1
+
             
             if(speeds[1] > 0):
+                self.frame = ((self.frame + 1) % len(self.front_imgs))
                 self.img = self.front_imgs[self.frame]
-            if(speeds[1] < 0):
+                self.dir = 2
+            elif(speeds[1] < 0):
+                self.frame = ((self.frame + 1) % len(self.back_imgs))
                 self.img = self.back_imgs[self.frame]
+                self.dir = 3
 
-            self.frame = (self.frame + 1) % len(self.side_imgs)
             self.frame_cooldown = 10
         else:
             self.frame_cooldown -= 1
