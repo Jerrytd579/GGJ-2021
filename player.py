@@ -12,7 +12,8 @@ class Dude:
         self.frame_cooldown = 10
         self.dir = 2
         self.stopped = True
-        self.flags = {}
+        self.flags = {'color_area_1':False}
+        self.reading = ""
 
 
     def update(self, level, camera, clock, pressed):
@@ -89,5 +90,5 @@ class Dude:
         if collidedVert:
             self.rect.y = vertRect.y
         for i in level.objects:
-            if i.rect.colliderect(self.rect) and justPressed == pygame.K_e:
-                i.interact()
+            if i.rect.colliderect(self.rect) and keys[pygame.K_e]:
+                i.interact(self)

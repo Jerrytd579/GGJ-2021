@@ -12,11 +12,14 @@ class GameStates(Enum):
     menu = 0
     park = 1
     minigame = 2
+    textbox = 3
 
 class Game:
     instance = None
     state = GameStates.menu
+    entered_text = ""
     sprites = {} # for map object sprites
+    colored_areas = []
 
     def __init__(self, w, h):
         pygame.init()
@@ -66,12 +69,34 @@ class Game:
     def render(self, img, rect, angle,camera):
         self.blitToSurface(self.display,img,rect,angle,camera)
 
+    def draw_scene_park(self):
+        self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+
+        if(self.player.flags['color_area_1'] and (1 not in self.colored_areas)):
+            self.level.reloadTilemap(2, True)
+            self.colored_areas.append(1)
+
+        for obj in self.level.objects:
+            if(obj.rect.y <= self.player.rect.y):
+                self.render(obj.img, obj.rect, 0,self.camera)
+
+            self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
+
+            if(obj.rect.y > self.player.rect.y):
+                self.render(obj.img, obj.rect, 0,self.camera)
+
+        if(self.player.reading != ""):
+            surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)  
+            
+            pygame.draw.rect(self.display, (0,0,0), pygame.Rect(0, 600, 1280, 120))
+            pygame.draw.rect(self.display, (255,255,255), pygame.Rect(0, 590, 1280, 10))
+            self.display.blit(surf, pygame.Rect(10, 610, rect.w, rect.h))
+
     def update(self):
         if(self.state == GameStates.menu):
             if(menu.menu_state(self.display, self.font, self.clock)):
                 self.state = GameStates.park
                 
-                #TODO: this could be cleaned up or moved to a function
 
                 fade = pygame.Surface((self.display_size[0], self.display_size[1]))
                 self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
@@ -95,13 +120,40 @@ class Game:
                     pygame.display.flip()
                     self.clock.tick(127.5)
 
+        elif(self.state == GameStates.textbox):
+            self.draw_scene_park()
+
+            pygame.draw.rect(self.display, (255,255,255), pygame.Rect((1280 / 2) - 460, (720 / 2) - 74, 920, 148))
+            pygame.draw.rect(self.display, (0,0,0), pygame.Rect((1280 / 2) - 450, (720 / 2) - 64, 900, 128))
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if(event.key != pygame.K_RETURN):
+                        self.entered_text += pygame.key.name(event.key)
+                    else:
+                        print("check riddles or whatever here")
+                        self.entered_text = ""
+                        self.state = GameStates.park
                 
+            surf, rect = self.font.render(self.entered_text, fgcolor = (255,255,255), size = 32)  
+            
+            self.display.blit(surf, pygame.Rect((1280 / 2) - 440, (720 / 2) - 54, rect.w, rect.h))
+
+            pygame.display.update()
+
         elif(self.state == GameStates.park):
             keyDown = False
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:  
                     keyDown = True
                     justPressed = event.key
+
+                    if(event.key == pygame.K_1):
+                        self.state = GameStates.textbox
+
+                    if(event.key == pygame.K_2):
+                        self.player.flags['color_area_1'] = True
+
                 else:
                     if event.type == pygame.QUIT:
                         self.running = False
@@ -111,29 +163,13 @@ class Game:
             
             self.display.fill((0,0,0))
 
-            if (self.level.reading == ""):
+            if (self.player.reading == ""):
                 self.player.update(self.level, self.camera, self.clock, self.justPressed)
-
-            else:
-                surf, rect = self.font.render(self.level.reading,fgcolor = (1,1,1),bgcolor = (0,0,0),size = 100)  
-
-                self.render(sign, pygame.Rect(10, 10, self.display_size[0] - 20, self.display_size[1] - 20), 0, self.baseCamera)
-                self.render(surf, pygame.Rect(30, 30, rect.w, rect.h) , 0, self.baseCamera)
-                if (justPressed == pygame.K_e):
-                    self.level.reading = ""
-
             
-            self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+            if (pygame.K_e in pygame.key.get_pressed()):
+                self.player.reading = ""
 
-            #TODO: Add wall rendering here
-            for obj in self.level.objects:
-                if(obj.rect.y < self.player.rect.y):
-                    self.render(obj.img, obj.rect, 0,self.camera)
-
-                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
-
-                if(obj.rect.y > self.player.rect.y):
-                    self.render(obj.img, obj.rect, 0,self.camera)
+            self.draw_scene_park()
 
             self.camera.x = self.player.rect.x + self.player.rect.w/2 - self.camera.w/2
             self.camera.y = self.player.rect.y + self.player.rect.h/2 - self.camera.h/2
