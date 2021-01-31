@@ -30,8 +30,6 @@ class Game:
         pygame.display.set_caption('hehe game')
         self.font = pygame.freetype.Font("MeleeSans.ttf")
         
-        self.sprites['sign'] = pygame.image.load("sprites/sign.png")
-        
         self.running = True
         self.justPressed = False
         self.justClicked = False
