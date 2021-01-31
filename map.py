@@ -40,19 +40,19 @@ class Level:
     walls = []
     objects = [] #anything that can be interacted with
     map_img = None
-    map_layers = [pygame.image.load('sprites/color_map.png'), pygame.image.load('sprites/quad_1.png'), pygame.image.load('sprites/quad_2.png'), pygame.image.load('sprites/quad_3.png'), pygame.image.load('sprites/quad_4.png')]
+    map_layers = {0: pygame.image.load('sprites/color_map.png'), 1: pygame.image.load('sprites/quad_1.png'), 2: pygame.image.load('sprites/quad_2.png'), 3: pygame.image.load('sprites/quad_3.png'), 4: pygame.image.load('sprites/quad_4.png')}
 
     def __init__(self):
         self.map_img = pygame.Surface((1600,1344))
         for layer in self.map_layers:
-            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
+            self.map_img.blit(pygame.transform.scale(self.map_layers[layer], (1600,1344)), (0,0))
         
         loadMapObjects(self)
 
     def update_mapimg(self, index):
         self.map_layers.pop(index)
         for layer in self.map_layers:
-            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
+            self.map_img.blit(pygame.transform.scale(self.map_layers[layer], (1600,1344)), (0,0))
 
     def addWall(self, wall):
         self.walls.append(wall)
@@ -238,4 +238,5 @@ class TulipField:
         else:
             import game
             self.game.state = game.GameStates.park
-            self.game.level.active_stages.remove(1)
+            self.game.level.update_mapimg(1)
+            #self.game.level.active_stages.remove(1)
