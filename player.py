@@ -24,17 +24,15 @@ class Dude:
         justPressed = pressed
         keys = pygame.key.get_pressed();
         velocity = .25
-        if (keys[pygame.K_LSHIFT]):
-            velocity = .5
         velocity *= clock.get_time()
         speeds = pygame.Vector2(0,0)
-        if (keys[pygame.K_RIGHT]):
+        if (keys[pygame.K_d]):
             speeds[0] += velocity
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_a]:
             speeds[0] -= velocity
-        if keys[pygame.K_UP]:
+        if keys[pygame.K_w]:
             speeds[1] -= velocity
-        elif keys[pygame.K_DOWN]:
+        elif keys[pygame.K_s]:
             speeds[1] += velocity
 
         if(speeds == [0,0] and not self.stopped):
