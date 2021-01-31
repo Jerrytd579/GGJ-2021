@@ -79,13 +79,10 @@ class Game:
             self.colored_areas.append(1)
 
         for obj in self.level.objects:
-            if(obj.rect.y + obj.rect.h <= self.player.rect.y + self.player.rect.h):
-                self.render(obj.img, obj.rect, 0,self.camera)
+            if(obj.rect.y <= self.player.rect.y + self.player.rect.h):
+                self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
             
-            self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
-
-            if(obj.rect.y + obj.rect.h > self.player.rect.y + self.player.rect.h):
-                self.render(obj.img, obj.rect, 0,self.camera)
+            self.render(obj.img, obj.rect, 0,self.camera)
 
         if(self.player.reading != ""):
             surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)  
@@ -108,15 +105,11 @@ class Game:
 
                     self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
-                    #TODO: Add wall rendering here
+                    #Don't need ordered rendering here since you arent overlapping anything at the start
                     for obj in self.level.objects:
-                        if(obj.rect.y + obj.rect.h <= self.player.rect.y + self.player.rect.h):
-                            self.render(obj.img, obj.rect, 0,self.camera)
+                        self.render(obj.img, obj.rect, 0,self.camera)
 
-                        self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
-
-                        if(obj.rect.y + obj.rect.h > self.player.rect.y + self.player.rect.h):
-                            self.render(obj.img, obj.rect, 0,self.camera)
+                    self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
                     self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
                     pygame.display.flip()

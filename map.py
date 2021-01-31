@@ -2,6 +2,7 @@ import pygame
 import json
 import random
 import os.path
+import random
 
 from map_data.tile_set import tile_images as color_tiles
 from map_data.tile_set_gray import tile_images as gray_tiles
@@ -36,6 +37,8 @@ def loadMapObjects(level):
     f = open('map.json') 
     map_dict = json.load(f)
 
+    used_button_indices = []
+
     for string in map_dict:
         obj = map_dict[string]
         if(obj['type'].lower() == "sign"):
@@ -52,7 +55,13 @@ def loadMapObjects(level):
             else:
                 s = Button(obj['enable_flag'], interact, obj['sprite'])
 
+            s.index = s.index = random.randint(0,4)
+            while(s.index in used_button_indices):
+                s.index = random.randint(0,4)
+
             level.addObject(s)
+    
+    level.objects.sort(key=lambda obj: obj.rect.y)
 
 class Level:
     walls = []
@@ -71,9 +80,7 @@ class Level:
         self.walls.append(wall)
 
     def addObject(self, obj):
-        self.objects.append(obj)
-
-    
+        self.objects.append(obj)    
 
 class Interactable:  #parent class of anything that can be interacted with
     spritePath = None
@@ -120,7 +127,7 @@ class Button(Interactable):
 
     def interact(self, dude):
         if(not self.enabled):
-            if(dude.flags['current_index'] == self.index):
+            if(not dude.flags['trees_complete'] and dude.flags['current_index'] == self.index):
                 dude.flags[f"button_{self.enableFlag}"] = True
                 self.enabled = True
                 dude.flags['current_index'] += 1
@@ -128,6 +135,9 @@ class Button(Interactable):
                 for x in range(0, dude.flags['current_index']):
                     dude.flags[f"button_{x}"] = False
                     dude.flags['current_index'] = 0
+
+            if(dude.flags['current_index'] == 4):
+                dude.flags['trees_complete'] = True
 
 class TulipField:
     curTulip = []
