@@ -39,11 +39,20 @@ def loadMapObjects(level):
 class Level:
     walls = []
     objects = [] #anything that can be interacted with
-    active_stages = [1, 2, 3, 4]
+    map_img = None
     map_layers = [pygame.image.load('sprites/color_map.png'), pygame.image.load('sprites/quad_1.png'), pygame.image.load('sprites/quad_2.png'), pygame.image.load('sprites/quad_3.png'), pygame.image.load('sprites/quad_4.png')]
 
     def __init__(self):
+        self.map_img = pygame.Surface((1600,1344))
+        for layer in self.map_layers:
+            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
+        
         loadMapObjects(self)
+
+    def update_mapimg(self, index):
+        self.map_layers.pop(index)
+        for layer in self.map_layers:
+            self.map_img.blit(pygame.transform.scale(layer, (1600,1344)), (0,0))
 
     def addWall(self, wall):
         self.walls.append(wall)
