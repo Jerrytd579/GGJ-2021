@@ -81,12 +81,12 @@ class Game:
             self.colored_areas.append(1)
 
         for obj in self.level.objects:
-            if(obj.rect.y <= self.player.rect.y):
+            if(obj.rect.y + obj.rect.h <= self.player.rect.y + self.player.rect.h):
                 self.render(obj.img, obj.rect, 0,self.camera)
-
+            
             self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
-            if(obj.rect.y > self.player.rect.y):
+            if(obj.rect.y + obj.rect.h > self.player.rect.y + self.player.rect.h):
                 self.render(obj.img, obj.rect, 0,self.camera)
 
         if(self.player.reading != ""):
@@ -112,13 +112,13 @@ class Game:
 
                     #TODO: Add wall rendering here
                     for obj in self.level.objects:
-                        if(obj.rect.y < self.player.rect.y):
+                        if(obj.rect.y + obj.rect.h <= self.player.rect.y + self.player.rect.h):
                             self.render(obj.img, obj.rect, 0,self.camera)
 
-                        self.render(self.player.img, pygame.Rect(self.player.rect[0] - 16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
+                        self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)
 
-                        if(obj.rect.y > self.player.rect.y):
-                                self.render(obj.img, obj.rect, 0)
+                        if(obj.rect.y + obj.rect.h > self.player.rect.y + self.player.rect.h):
+                            self.render(obj.img, obj.rect, 0,self.camera)
 
                     self.display.blit(fade, pygame.Rect(0, 0, self.display_size[0], self.display_size[1]))
                     pygame.display.flip()
