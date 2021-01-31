@@ -143,6 +143,18 @@ class Sprite(Interactable):
             if(dude.flags['current_index'] == 4):
                 dude.flags['trees_complete'] = True
 
+class Wheel(Interactable):
+    part = 4
+    def __init__(self,rect):
+        Interactable.__init__(self,rect,"objects/wheel4.png")
+    def interact(self,dude):
+        self.part -= 1
+        if (self.part >= 1):
+            self.img = pygame.image.load("objects/wheel" + str(self.part)+".png")
+        if (self.part == 1):
+            dude.flags['color_area_4'] = not dude.flags['color_area_4']
+            
+
 class TulipField:
     curTulip = []
     curCounter = []
@@ -200,9 +212,12 @@ class TulipField:
             if len(self.curCounter) == len(self.curTulip):
             
                 pos = (random.randrange(0,self.tulipPerRow),random.randrange(0,self.tulipPerCol))
+                pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
                 while pos in self.curTulip:
                     pos = (random.randrange(0,self.tulipPerRow),random.randrange(0,self.tulipPerCol))
-                pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
+                    pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
+                #pos = ((pos[0] + self.startPos[0])*self.dimen,(pos[1] + self.startPos[1])*self.dimen)
+                #print(pos)
                 self.curTulip.append(pos)
                 self.showBlinks()
                 #self.game.blitToSurface(self.mask,self.curTulipImg,pygame.Rect(pos[0],pos[1],self.dimen,self.dimen),0,pygame.Rect(0,0,0,0))
@@ -215,6 +230,7 @@ class TulipField:
         else:
             import game
             self.game.state = game.GameStates.park
+            self.game.player.flags['color_area_1'] = True
 def load_map_objects(level):
     f = open('map.json') 
     map_dict = json.load(f)
