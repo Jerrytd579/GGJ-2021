@@ -4,9 +4,6 @@ import random
 import os.path
 import random
 
-from map_data.tile_set import tile_images as color_tiles
-from map_data.tile_set_gray import tile_images as gray_tiles
-
 def loadMapObjects(level):
     f = open('map.json') 
     map_dict = json.load(f)
@@ -42,10 +39,10 @@ def loadMapObjects(level):
 class Level:
     walls = []
     objects = [] #anything that can be interacted with
-    active_stage = 0
+    active_stages = [1, 2, 3, 4]
+    map_layers = [pygame.image.load('sprites/color_map.png'), pygame.image.load('sprites/quad_1.png'), pygame.image.load('sprites/quad_2.png'), pygame.image.load('sprites/quad_3.png'), pygame.image.load('sprites/quad_4.png')]
 
     def __init__(self):
-        self.map_layers = []
         loadMapObjects(self)
 
     def addWall(self, wall):
@@ -223,4 +220,4 @@ class TulipField:
         else:
             import game
             self.game.state = game.GameStates.park
-            self.game.player.flags['color_area_1'] = True
+            self.game.level.active_stages.remove(1)

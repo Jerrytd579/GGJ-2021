@@ -82,19 +82,20 @@ class Game:
         self.blitToSurface(self.display,img,rect,angle,camera)
 
     def draw_scene_park(self):
-        self.render(self.level.map_layers[self.level.active_stage], pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+        
+        if(self.player.flags['color_area_4'] and 4 in self.level.active_stages):
+            self.level.active_stages.remove(4)
+
+        self.render(self.level.map_layers[0], pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+
+        for stage in self.level.active_stages:
+            self.render(self.level.map_layers[stage], pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
         for obj in self.level.objects:
+            if(obj.img != None):
                 self.render(obj.img, obj.rect, 0,self.camera)
             
         self.render(self.player.img, pygame.Rect(self.player.rect[0] -16, self.player.rect[1] - 40, 64, 64), 0,self.camera)    
-
-        if(self.player.reading != ""):
-            surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)  
-            
-            pygame.draw.rect(self.display, (0,0,0), pygame.Rect(0, 600, 1280, 120))
-            pygame.draw.rect(self.display, (255,255,255), pygame.Rect(0, 590, 1280, 10))
-            self.display.blit(surf, pygame.Rect(10, 610, rect.w, rect.h))
 
     def update(self):
         self.justPressed = None
@@ -107,7 +108,7 @@ class Game:
                     self.state = GameStates.textbox
 
                 if(event.key == pygame.K_2):
-                    self.player.flags['color_area_1'] = True
+                    self.level.active_stages.remove(1)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.justClicked = True
@@ -124,7 +125,7 @@ class Game:
                 for x in range(0, 255):
                     fade.set_alpha(255-x)
 
-                    self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
+                    
 
                     #Don't need ordered rendering here since you arent overlapping anything at the start
                     for obj in self.level.objects:
@@ -149,14 +150,26 @@ class Game:
                         self.entered_text += pygame.key.name(event.key)
                     elif(event.key == pygame.K_BACKSPACE):
                         self.entered_text = self.entered_text[0:-1]
-                    else:
-                        print("check riddles or whatever here")
-                        self.entered_text = ""
-                        self.state = GameStates.park
+                    elif(event.key == pygame.K_RETURN):
+                        #check that cypher is correct
+                        if(self.entered_text == ""):
+                            self.level.active_stages.remove(2)
+                            self.entered_text = ""
+                            self.state = GameStates.park
+                        
+                        else:
+                            #TODO: play sfx when cypher wrong
+                            pass
                 
             surf, rect = self.font.render(self.entered_text, fgcolor = (255,255,255), size = 32)  
-            
             self.display.blit(surf, pygame.Rect((1280 / 2) - 440, (720 / 2) - 54, rect.w, rect.h))
+
+            #CYPHER TEXT DRAWN HERE, REPLACE plyer.reader WITH CYPHER TEXT
+            surf, rect = self.font.render(self.player.reading,fgcolor = (255,255,255), size = 32)              
+            
+            pygame.draw.rect(self.display, (0,0,0), pygame.Rect(0, 600, 1280, 120))
+            pygame.draw.rect(self.display, (255,255,255), pygame.Rect(0, 590, 1280, 10))
+            self.display.blit(surf, pygame.Rect(10, 610, rect.w, rect.h))
 
             pygame.display.update()
 
@@ -164,11 +177,8 @@ class Game:
 
             self.display.fill((0,0,0,0))
 
-            if (self.player.reading == ""):
-                self.player.update(self.level, self.camera, self.clock, self.justPressed)
             
-            if (pygame.K_e in pygame.key.get_pressed()):
-                self.player.reading = ""
+            self.player.update(self.level, self.camera, self.clock, self.justPressed)
 
             self.draw_scene_park()
             
