@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame, sys, os
 
 def menu_state(screen, font, clock):
     pygame.mixer_music.load('music/njit-title.wav')
@@ -18,7 +18,13 @@ def menu_state(screen, font, clock):
         [text1, rect1, NOT_HELD],
         [text2, rect2, NOT_HELD],
     ]
-    print(text1)
+    
+
+    bg_img = None
+    if(os.path.isfile('completed.txt')):
+        bg_img = pygame.image.load('sprites/njit-endscreen.png')
+    else:
+        bg_img = pygame.image.load('sprites/njit-endscreen-grey.png')
 
     while True:
         for event in pygame.event.get():
@@ -52,7 +58,8 @@ def menu_state(screen, font, clock):
 
                     return True
 
-        screen.fill((255, 251, 219))
+        screen.blit(bg_img, (0,0))
+
         for text, rect, color in buttons:
             pygame.draw.rect(screen, color, rect)
             screen.blit(text, [610, rect[1] + 16])

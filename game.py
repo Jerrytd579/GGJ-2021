@@ -81,9 +81,25 @@ class Game:
     def draw_scene_park(self):
         self.render(self.level.tilemap, pygame.Rect(0, 0, 1600,1344), 0,self.camera)
 
-        if(self.player.flags['color_area_1'] and (1 not in self.colored_areas)):
+        if((2 not in self.colored_areas) and self.player.flags['color_area_1']):
             self.level.reloadTilemap(2, True)
-            self.colored_areas.append(1)
+            self.colored_areas.append(2)
+
+        if((3 not in self.colored_areas) and self.player.flags['color_area_3']):
+            self.level.reloadTilemap(3, True)
+            self.colored_areas.append(3)
+
+        if((4 not in self.colored_areas) and self.player.flags['color_area_4']):
+            self.level.reloadTilemap(4, True)
+            self.colored_areas.append(4)
+
+        if((5 not in self.colored_areas) and self.player.flags['color_area_5']):
+            self.level.reloadTilemap(5, True)
+            self.colored_areas.append(5)
+
+        if((6 not in self.colored_areas) and self.player.flags['color_area_6']):
+            self.level.reloadTilemap(6, True)
+            self.colored_areas.append(6)
 
         for obj in self.level.objects:
             if(obj.rect.y <= self.player.rect.y + self.player.rect.h):
