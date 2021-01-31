@@ -197,8 +197,9 @@ class Game:
             self.tulips.update()
             pygame.display.update()
             self.clock.tick(120)
+            
         elif self.state == GameStates.finished:
 
-            self.render(self.finishImage,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
+            #self.render(self.finishImage,pygame.Rect(0,0,self.display_size[0],self.display_size[1]),0,self.baseCamera)
             pygame.display.update()
             self.clock.tick(120)

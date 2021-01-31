@@ -32,8 +32,6 @@ def loadMapObjects(level):
             
             used_button_indices.append(s.index)
 
-            s.grayscale(True)
-
             level.addObject(s)
 
 class Level:
@@ -112,24 +110,21 @@ class Button(Interactable):
     def __init__(self, enableFlag, rect, spritePath):
         Interactable.__init__(self, rect, spritePath)
         self.enableFlag = enableFlag
-        self.enabled = False
         self.index = -1
 
     def interact(self, dude):
-        if(not self.enabled):
-            self.grayscale()
+        if(not dude.flags[f"button_{self.enableFlag}"]):
             print(f"{self.index} : {dude.flags['current_index']}")
             if(not dude.flags['trees_complete'] and dude.flags['current_index'] == self.index):
                 dude.flags[f"button_{self.enableFlag}"] = True
-                self.enabled = True
                 dude.flags['current_index'] += 1
-                self.grayscale(False)
             else:
-                for x in range(0, dude.flags['current_index']):
+                self.enabled = False
+                for x in range(1, dude.flags['current_index']):
                     dude.flags[f"button_{x}"] = False
                     dude.flags['current_index'] = 0
 
-            if(dude.flags['current_index'] == 4):
+            if(dude.flags['current_index'] > 4):
                 dude.flags['trees_complete'] = True
 
 #dylan
